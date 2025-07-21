@@ -1,0 +1,37 @@
+# Version catalog is a central place for you to declare and version dependencies
+# https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
+# https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
+
+[versions]
+kotlin = "2.2.0"
+kotlinx-coroutines = "1.10.2"
+kotlinx-browser = "0.3"
+dslUtilities = "1.0.0"
+compose = "1.8.2"
+agp = "8.10.0"
+androidx = "1.16.0"
+androidx-annotation = "1.9.1"
+androidx-test-runner = "1.6.2"
+androidx-test-junit = "1.2.1"
+dokka = "2.0.0"
+mavenPublish = "0.34.0"
+
+[libraries]
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
+dslUtilities = { module = "top.ltfan.dslutilities:dsl-utilities", version.ref = "dslUtilities" }
+androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx" }
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
+androidx-test-junit = { module = "androidx.test.ext:junit-ktx", version.ref = "androidx-test-junit" }
+
+# Libraries can be bundled together for easier import
+[bundles]
+
+[plugins]
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }

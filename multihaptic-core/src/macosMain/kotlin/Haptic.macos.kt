@@ -23,8 +23,7 @@ import top.ltfan.multihaptic.vibrator.Vibrator
  *   context.
  * @return An instance of [Vibrator].
  */
-@ExperimentalForeignApi
-@BetaInteropApi
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual fun getVibrator(coroutineScope: CoroutineScope, config: Any?): Vibrator {
     val processInfo = NSProcessInfo.processInfo
     val version = processInfo.operatingSystemVersion

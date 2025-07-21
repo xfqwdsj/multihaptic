@@ -16,8 +16,7 @@ import top.ltfan.multihaptic.vibrator.Vibrator
  * Warning: This function does not check system version and may cause
  * crashes on older systems.
  */
-@ExperimentalForeignApi
-@BetaInteropApi
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 fun getCoreHapticsVibrator(coroutineScope: CoroutineScope): Vibrator? {
     if (!CHHapticEngine.Companion.capabilitiesForHardware().supportsHaptics) return null
 

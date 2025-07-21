@@ -10,8 +10,7 @@ import top.ltfan.multihaptic.vibrator.StubVibrator
 import top.ltfan.multihaptic.vibrator.UIFeedbackVibrator
 import top.ltfan.multihaptic.vibrator.Vibrator
 
-@ExperimentalForeignApi
-@BetaInteropApi
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual fun getVibrator(coroutineScope: CoroutineScope, config: Any?): Vibrator {
     val version = UIDevice.currentDevice.systemVersion.split(".").map { it.toInt() }
     if (version.first() >= 13) getCoreHapticsVibrator(coroutineScope)?.let { return it }

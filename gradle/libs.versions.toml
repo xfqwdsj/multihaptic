@@ -5,7 +5,7 @@
 [versions]
 kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
-kotlinx-browser = "0.3"
+kotlinx-browser = "0.5.0"
 dslUtilities = "1.0.0"
 compose = "1.8.2"
 agp = "8.10.0"

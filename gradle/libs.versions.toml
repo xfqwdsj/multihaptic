@@ -3,7 +3,7 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin = "2.2.0"
+kotlin = "2.2.20"
 kotlinx-coroutines = "1.10.2"
 kotlinx-browser = "0.3"
 dslUtilities = "1.0.0"

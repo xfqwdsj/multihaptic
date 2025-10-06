@@ -19,13 +19,22 @@ import kotlin.test.assertTrue
 class AbstractVibratorTest {
 
     /**
-     * A test implementation of AbstractVibrator that records all performed effects.
+     * A test implementation of AbstractVibrator that records all performed effects
+     * and simulates playback duration using delays.
      */
     private class TestVibrator(coroutineScope: CoroutineScope) : AbstractVibrator(coroutineScope) {
         val performedEffects = mutableListOf<HapticEffect>()
 
         override suspend fun perform(effect: HapticEffect) {
             performedEffects.add(effect)
+            // Simulate playback duration based on effect duration
+            val duration = effect.primitives.sumOf { primitive ->
+                when (val basic = primitive.basic) {
+                    is top.ltfan.multihaptic.BasicPrimitive.Predefined -> basic.type.duration.inWholeMilliseconds
+                    is top.ltfan.multihaptic.BasicPrimitive.Custom -> basic.duration.inWholeMilliseconds
+                }
+            }
+            delay(duration)
         }
 
         override fun cancel() {
@@ -35,6 +44,7 @@ class AbstractVibratorTest {
 
     @Test
     fun testMultipleIdenticalEffectsAreProcessed() = runTest {
+        
         val vibrator = TestVibrator(backgroundScope)
         
         // Create the same haptic effect multiple times
@@ -62,6 +72,7 @@ class AbstractVibratorTest {
 
     @Test
     fun testConflationDiscardsOldEffects() = runTest {
+        
         val vibrator = TestVibrator(backgroundScope)
         
         val effect1 = HapticEffect {
@@ -103,6 +114,7 @@ class AbstractVibratorTest {
 
     @Test
     fun testRapidSuccessiveIdenticalEffects() = runTest {
+        
         val vibrator = TestVibrator(backgroundScope)
         
         val effect = HapticEffect {
@@ -129,6 +141,7 @@ class AbstractVibratorTest {
 
     @Test
     fun testDifferentEffectsAreProcessed() = runTest {
+        
         val vibrator = TestVibrator(backgroundScope)
         
         val clickEffect = HapticEffect {
@@ -164,6 +177,7 @@ class AbstractVibratorTest {
 
     @Test
     fun testMixedIdenticalAndDifferentEffects() = runTest {
+        
         val vibrator = TestVibrator(backgroundScope)
         
         val effect1 = HapticEffect {
@@ -201,6 +215,7 @@ class AbstractVibratorTest {
 
     @Test
     fun testSingleEffectIsProcessed() = runTest {
+        
         val vibrator = TestVibrator(backgroundScope)
         
         val effect = HapticEffect {
@@ -217,6 +232,7 @@ class AbstractVibratorTest {
 
     @Test
     fun testEffectsWithSameTypeButDifferentParameters() = runTest {
+        
         val vibrator = TestVibrator(backgroundScope)
         
         val effect1 = HapticEffect {
@@ -249,6 +265,7 @@ class AbstractVibratorTest {
 
     @Test
     fun testHighFrequencyIdenticalEffects() = runTest {
+        
         val vibrator = TestVibrator(backgroundScope)
         
         val effect = HapticEffect {
@@ -270,6 +287,7 @@ class AbstractVibratorTest {
 
     @Test
     fun testEffectWithMultiplePrimitives() = runTest {
+        
         val vibrator = TestVibrator(backgroundScope)
         
         val effect = HapticEffect {

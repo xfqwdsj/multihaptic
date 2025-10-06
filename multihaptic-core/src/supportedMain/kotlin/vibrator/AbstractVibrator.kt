@@ -6,7 +6,7 @@ import kotlinx.coroutines.launch
 import top.ltfan.multihaptic.HapticEffect
 
 abstract class AbstractVibrator internal constructor(coroutineScope: CoroutineScope) : StubVibrator() {
-    protected val nextEffect = MutableSharedFlow<HapticEffect>(replay = 0, extraBufferCapacity = 1)
+    protected val nextEffect = MutableSharedFlow<HapticEffect>(replay = 0, extraBufferCapacity = 64)
 
     init {
         coroutineScope.launch {

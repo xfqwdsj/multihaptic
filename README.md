@@ -30,7 +30,7 @@ Or if you are using Gradle Version Catalogs, add the following to your `gradle/l
 multihaptic = "<version>"
 
 [libraries]
-ltmath = { module = "top.ltfan.multihaptic:multihaptic-core", version.ref = "multihaptic" }
+multihaptic = { module = "top.ltfan.multihaptic:multihaptic-core", version.ref = "multihaptic" }
 multihaptic-compose = { module = "top.ltfan.multihaptic:multihaptic-compose", version.ref = "multihaptic" }
 multihaptic-platformDsl = { module = "top.ltfan.multihaptic:multihaptic-platform-dsl", version.ref = "multihaptic" }
 ```
@@ -113,12 +113,12 @@ the `rememberVibrator` from a Composable function to get a `Vibrator` instance a
 |-------------------------------------|--------------------|-------------------------|--------------------------------------------------------------------------------------|
 | Android                             | ✅ Supported        | ✅ Supported             | Uses multiple vibration API; advanced composition/custom effects depend on API level |
 | iOS (CoreHaptics, 13.0+)            | ✅ Supported        | ✅ Supported             | Core Haptics for complex custom effects                                              |
-| iOS (UIKit, 10.0+)                  | ✅ Supported        | 🚫 Not Supported        | UIFeedbackGenerator for predefined feedback only                                     |
+| iOS (UIKit, 10.0+)                  | ✅ Supported        | 🚫 Fallback             | UIFeedbackGenerator for predefined feedback only                                     |
 | macOS (CoreHaptics/Catalyst, 13.0+) | ✅ Supported        | ✅ Supported             | Core Haptics available for Mac Catalyst apps                                         |
-| macOS (AppKit, 10.11+)              | ✅ Supported        | 🚫 Not Supported        | AppKit Haptic Feedback, only preset effects                                          |
-| watchOS                             | ✅ Supported        | 🚫 Not Supported        | WatchKit haptic types, mapped to predefined effects                                  |
+| macOS (AppKit, 10.11+)              | ✅ Supported        | 🚫 Fallback             | AppKit Haptic Feedback, only preset effects                                          |
+| watchOS                             | ✅ Supported        | 🚫 Fallback             | WatchKit haptic types, mapped to predefined effects                                  |
 | tvOS (14.0+)                        | ✅ Supported        | ✅ Supported             | Core Haptics if available                                                            |
-| Browser (Web/JS/WASM)               | ✅ Supported        | 🚫 Not Supported        | Web Vibration API, only duration-based vibration                                     |
+| Browser (Web/Js/Wasm)               | ✅ Supported        | 🚫 Fallback             | Web Vibration API, only duration-based vibration                                     |
 | Windows                             | 🚫 No effect       | 🚫 No effect            |                                                                                      |
 | Linux                               | 🚫 No effect       | 🚫 No effect            |                                                                                      |
 

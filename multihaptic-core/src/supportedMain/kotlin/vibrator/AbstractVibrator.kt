@@ -1,16 +1,16 @@
 package top.ltfan.multihaptic.vibrator
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import top.ltfan.multihaptic.HapticEffect
 
 abstract class AbstractVibrator internal constructor(coroutineScope: CoroutineScope) : StubVibrator() {
-    protected val nextEffect = MutableSharedFlow<HapticEffect>(replay = 0, extraBufferCapacity = 64)
+    private val effectChannel = Channel<HapticEffect>(Channel.CONFLATED)
 
     init {
         coroutineScope.launch {
-            nextEffect.collect { effect ->
+            for (effect in effectChannel) {
                 perform(effect)
             }
         }
@@ -19,6 +19,6 @@ abstract class AbstractVibrator internal constructor(coroutineScope: CoroutineSc
     protected abstract suspend fun perform(effect: HapticEffect)
 
     override fun vibrate(effect: HapticEffect) {
-        nextEffect.tryEmit(effect)
+        effectChannel.trySend(effect)
     }
 }

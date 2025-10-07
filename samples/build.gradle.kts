@@ -41,7 +41,6 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":multihaptic-platform-dsl"))
                 implementation(project(":multihaptic-core"))
             }
         }
@@ -60,6 +59,9 @@ kotlin {
 
         val androidMain by getting {
             dependsOn(supportedMain)
+            dependencies {
+                implementation(project(":multihaptic-platform-dsl"))
+            }
         }
 
         val appleMain by getting {
@@ -68,6 +70,9 @@ kotlin {
 
         val appleCoreHapticsMain by creating {
             dependsOn(appleMain)
+            dependencies {
+                implementation(project(":multihaptic-platform-dsl"))
+            }
         }
 
         val macosMain by getting {

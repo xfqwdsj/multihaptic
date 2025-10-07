@@ -52,8 +52,20 @@ kotlin {
             }
         }
 
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.coroutines.test)
+            }
+        }
+
         val supportedMain by creating {
             dependsOn(commonMain)
+        }
+
+        val supportedTest by creating {
+            dependsOn(commonTest)
         }
 
         val unsupportedMain by creating {
@@ -71,6 +83,10 @@ kotlin {
                 implementation(libs.androidx.core)
                 implementation(libs.androidx.annotation)
             }
+        }
+
+        val androidUnitTest by getting {
+            dependsOn(supportedTest)
         }
 
         val appleMain by getting {
@@ -195,7 +211,7 @@ mavenPublishing {
     configure(
         KotlinMultiplatform(
             javadocJar = JavadocJar.Dokka(tasks.dokkaGeneratePublicationHtml),
-        )
+        ),
     )
 }
 

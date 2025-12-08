@@ -6,7 +6,7 @@
 kotlin = "2.2.21"
 kotlinx-coroutines = "1.10.2"
 kotlinx-browser = "0.5.0"
-dslUtilities = "1.0.1"
+dslUtilities = "1.0.2"
 compose = "1.9.3"
 agp = "8.12.3"
 androidx = "1.17.0"

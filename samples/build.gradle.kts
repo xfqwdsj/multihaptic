@@ -12,9 +12,19 @@ kotlin {
             jvmTarget = JvmTarget.JVM_1_8
         }
     }
-    androidTarget {
+    android {
+        namespace = "top.ltfan.multihaptic"
+        compileSdk = 36
+        minSdk = 21
+
         compilerOptions {
             jvmTarget = JvmTarget.JVM_1_8
+        }
+
+        packaging {
+            resources {
+                excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            }
         }
     }
     macosX64()
@@ -110,28 +120,6 @@ kotlin {
 
     compilerOptions {
         freeCompilerArgs.add("-Xcontext-parameters")
-    }
-}
-
-android {
-    namespace = "top.ltfan.multihaptic"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 21
-    }
-
-    sourceSets {}
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
     }
 }
 

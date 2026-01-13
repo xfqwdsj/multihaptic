@@ -17,10 +17,23 @@ kotlin {
             jvmTarget = JvmTarget.JVM_1_8
         }
     }
-    androidTarget {
-        publishLibraryVariants("release")
+    android {
+        namespace = "top.ltfan.multihaptic"
+        compileSdk = 36
+        minSdk = 21
+
+        withHostTest {
+            isIncludeAndroidResources = true
+        }
+
         compilerOptions {
             jvmTarget = JvmTarget.JVM_1_8
+        }
+
+        packaging {
+            resources {
+                excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            }
         }
     }
     macosX64()
@@ -85,7 +98,7 @@ kotlin {
             }
         }
 
-        val androidUnitTest by getting {
+        val androidHostTest by getting {
             dependsOn(supportedTest)
         }
 
@@ -139,28 +152,6 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xcontext-parameters")
         freeCompilerArgs.add("-Xcontext-sensitive-resolution")
-    }
-}
-
-android {
-    namespace = "top.ltfan.multihaptic"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 21
-    }
-
-    sourceSets {}
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
     }
 }
 

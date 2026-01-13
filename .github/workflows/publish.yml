@@ -25,6 +25,8 @@ jobs:
       - name: Set up node
         run: |
           ./gradlew kotlinNodeJsSetup kotlinWasmNodeJsSetup kotlinNpmInstall kotlinWasmNpmInstall
+      - name: Run tests
+        run: ./gradlew allTests
       - name: Publish to GitHub Packages
         continue-on-error: true
         run: |

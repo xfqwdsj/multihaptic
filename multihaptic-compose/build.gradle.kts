@@ -56,7 +56,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":multihaptic-core"))
-                implementation(compose.runtime)
+                implementation(libs.compose.runtime)
             }
         }
 
@@ -80,7 +80,7 @@ kotlin {
         val androidMain by getting {
             dependsOn(supportedMain)
             dependencies {
-                implementation(compose.ui)
+                implementation(libs.compose.ui)
             }
         }
 

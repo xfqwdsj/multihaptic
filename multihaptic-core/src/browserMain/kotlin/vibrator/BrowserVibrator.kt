@@ -2,6 +2,7 @@ package top.ltfan.multihaptic.vibrator
 
 import kotlinx.coroutines.CoroutineScope
 import top.ltfan.multihaptic.HapticEffect
+import top.ltfan.multihaptic.isVibrateSupported
 import top.ltfan.multihaptic.performByDuration
 import top.ltfan.multihaptic.unpack
 import top.ltfan.multihaptic.vibrate
@@ -18,5 +19,9 @@ class BrowserVibrator internal constructor(coroutineScope: CoroutineScope) : Abs
 
     override fun cancel() {
         vibrate(Duration.Companion.ZERO)
+    }
+
+    override fun isVibrationSupported(): Boolean {
+        return isVibrateSupported()
     }
 }

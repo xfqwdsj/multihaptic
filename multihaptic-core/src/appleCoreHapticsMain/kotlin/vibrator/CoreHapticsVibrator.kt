@@ -19,6 +19,8 @@ import kotlin.time.Duration.Companion.milliseconds
 class CoreHapticsVibrator internal constructor(coroutineScope: CoroutineScope, private val engine: CHHapticEngine) :
     AbstractVibrator(coroutineScope) {
 
+    override fun isVibrationSupported(): Boolean = true
+
     @ExperimentalForeignApi
     @BetaInteropApi
     override suspend fun perform(effect: HapticEffect) {

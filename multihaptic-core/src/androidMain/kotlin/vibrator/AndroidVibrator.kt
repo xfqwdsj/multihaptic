@@ -40,6 +40,8 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
 
     override fun cancel() = vibrator.cancel()
 
+    override fun isVibrationSupported(): Boolean = vibrator.hasVibrator()
+
     private val HapticEffect.isComposedSupported: Boolean
         @RequiresApi(Build.VERSION_CODES.R) inline get() = primitives.all { it.basic is BasicPrimitive.Predefined } && vibrator.areAllPrimitivesSupported(
             *primitives.map { (it.basic as? BasicPrimitive.Predefined)?.composedPrimitiveType?.id ?: return false }

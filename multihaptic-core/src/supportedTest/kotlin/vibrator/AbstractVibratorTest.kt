@@ -380,7 +380,11 @@ class AbstractVibratorTest {
         // TestVibrator (extends AbstractVibrator) should return false by default
         val testVibrator = TestVibrator(this)
         testVibrator.use {
-            assertEquals(false, testVibrator.isVibrationSupported(), "TestVibrator should not support vibration by default")
+            assertEquals(
+                false,
+                testVibrator.isVibrationSupported(),
+                "TestVibrator should not support vibration by default",
+            )
         }
     }
 }

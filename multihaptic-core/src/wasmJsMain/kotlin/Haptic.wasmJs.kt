@@ -1,7 +1,6 @@
 package top.ltfan.multihaptic
 
 import kotlinx.browser.window
-import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.time.Duration
 
 internal actual fun vibrate(duration: Duration) {

@@ -18,7 +18,7 @@ class BrowserVibrator internal constructor(coroutineScope: CoroutineScope) : Abs
     }
 
     override fun cancel() {
-        vibrate(Duration.Companion.ZERO)
+        vibrate(Duration.ZERO)
     }
 
     override fun isVibrationSupported(): Boolean {

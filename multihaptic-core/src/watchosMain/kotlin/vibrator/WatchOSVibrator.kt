@@ -10,7 +10,7 @@ import top.ltfan.multihaptic.PrimitiveType
 import top.ltfan.multihaptic.unpack
 
 class WatchOSVibrator internal constructor(coroutineScope: CoroutineScope) : AbstractVibrator(coroutineScope) {
-    private val device = WKInterfaceDevice.Companion.currentDevice()
+    private val device = WKInterfaceDevice.currentDevice()
 
     override fun isVibrationSupported(): Boolean = true
 

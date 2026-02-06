@@ -10,10 +10,16 @@ import platform.android.dsl.ComposedVibrationEffectBuilder
 import platform.android.dsl.EnvelopeVibrationEffectBuilder
 import platform.android.dsl.composedVibrationEffect
 import platform.android.dsl.onOffVibrationEffect
-import top.ltfan.multihaptic.*
+import top.ltfan.multihaptic.BasicPrimitive
+import top.ltfan.multihaptic.DelayType
+import top.ltfan.multihaptic.HapticCurves
+import top.ltfan.multihaptic.HapticEffect
+import top.ltfan.multihaptic.PrimitiveType
+import top.ltfan.multihaptic.duration
 import top.ltfan.multihaptic.platform.android.OffTimeOfCustomOnOffEffect
 import top.ltfan.multihaptic.platform.android.amplitudeVibrationEffect
 import top.ltfan.multihaptic.platform.android.envelopeVibrationEffect
+import top.ltfan.multihaptic.unpack
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -40,7 +46,7 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
 
     override fun cancel() = vibrator.cancel()
 
-    override val isVibrationSupported: Boolean = vibrator.hasVibrator()
+    override val isVibrationSupported get() = vibrator.hasVibrator()
 
     private val HapticEffect.isComposedSupported: Boolean
         @RequiresApi(Build.VERSION_CODES.R) inline get() = primitives.all { it.basic is BasicPrimitive.Predefined } && vibrator.areAllPrimitivesSupported(

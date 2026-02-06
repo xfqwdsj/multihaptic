@@ -21,6 +21,5 @@ class BrowserVibrator internal constructor(coroutineScope: CoroutineScope) : Abs
         vibrate(Duration.ZERO)
     }
 
-    override val isVibrationSupported: Boolean
-        get() = isVibrateSupported()
+    override val isVibrationSupported get() = isVibrateSupported()
 }

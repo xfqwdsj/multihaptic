@@ -13,7 +13,7 @@ import top.ltfan.multihaptic.unpack
 class UIFeedbackVibrator internal constructor(coroutineScope: CoroutineScope, private val uiView: UIView?) :
     AbstractVibrator(coroutineScope) {
 
-    override fun isVibrationSupported(): Boolean = true
+    override val isVibrationSupported: Boolean = true
 
     override suspend fun perform(effect: HapticEffect) {
         effect.unpack { it.feedback() }

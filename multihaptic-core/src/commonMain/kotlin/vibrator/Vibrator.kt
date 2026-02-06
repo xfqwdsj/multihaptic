@@ -34,5 +34,6 @@ interface Vibrator {
      * @return `true` if vibration hardware and API are available, `false`
      *   otherwise.
      */
-    fun isVibrationSupported(): Boolean = false
+    val isVibrationSupported: Boolean
+        get() = false
 }

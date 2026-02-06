@@ -10,10 +10,16 @@ import platform.android.dsl.ComposedVibrationEffectBuilder
 import platform.android.dsl.EnvelopeVibrationEffectBuilder
 import platform.android.dsl.composedVibrationEffect
 import platform.android.dsl.onOffVibrationEffect
-import top.ltfan.multihaptic.*
+import top.ltfan.multihaptic.BasicPrimitive
+import top.ltfan.multihaptic.DelayType
+import top.ltfan.multihaptic.HapticCurves
+import top.ltfan.multihaptic.HapticEffect
+import top.ltfan.multihaptic.PrimitiveType
+import top.ltfan.multihaptic.duration
 import top.ltfan.multihaptic.platform.android.OffTimeOfCustomOnOffEffect
 import top.ltfan.multihaptic.platform.android.amplitudeVibrationEffect
 import top.ltfan.multihaptic.platform.android.envelopeVibrationEffect
+import top.ltfan.multihaptic.unpack
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -39,6 +45,8 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
     }
 
     override fun cancel() = vibrator.cancel()
+
+    override val isVibrationSupported get() = vibrator.hasVibrator()
 
     private val HapticEffect.isComposedSupported: Boolean
         @RequiresApi(Build.VERSION_CODES.R) inline get() = primitives.all { it.basic is BasicPrimitive.Predefined } && vibrator.areAllPrimitivesSupported(
@@ -159,7 +167,7 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
                     val intensity = getValueAt(time, curves.intensity)
                     val sharpness = getValueAt(time, curves.sharpness)
                     controlPoints.add(
-                        EnvelopeVibrationEffectBuilder.PointData(intensity, sharpness) to time + timeShift
+                        EnvelopeVibrationEffectBuilder.PointData(intensity, sharpness) to time + timeShift,
                     )
                 }
 
@@ -264,8 +272,8 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
                 val intensityCurve = buildList {
                     val first = curves.intensity.first()
                     val last = curves.intensity.last()
-                    if (first.time != Duration.Companion.ZERO) {
-                        add(HapticCurves.Keyframe(Duration.Companion.ZERO, first.value))
+                    if (first.time != Duration.ZERO) {
+                        add(HapticCurves.Keyframe(Duration.ZERO, first.value))
                     }
                     addAll(curves.intensity)
                     if (last.time != duration) {
@@ -286,7 +294,7 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
                 }
 
                 VibrationEffect.createWaveform(
-                    times.toLongArray(), amplitudes.toIntArray(), -1
+                    times.toLongArray(), amplitudes.toIntArray(), -1,
                 )
             }
         }
@@ -339,8 +347,8 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
                 val times = mutableListOf<Long>()
 
                 val intensityCurve = mutableListOf<HapticCurves.Keyframe>().apply {
-                    if (curves.intensity.first().time != Duration.Companion.ZERO) {
-                        add(HapticCurves.Keyframe(Duration.Companion.ZERO, 0f))
+                    if (curves.intensity.first().time != Duration.ZERO) {
+                        add(HapticCurves.Keyframe(Duration.ZERO, 0f))
                     }
                     addAll(curves.intensity)
                 }

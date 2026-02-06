@@ -27,4 +27,13 @@ interface Vibrator {
 
     /** Cancels any ongoing vibrations. */
     fun cancel()
+
+    /**
+     * Checks if vibration is supported on this platform/device.
+     *
+     * @return `true` if vibration hardware and API are available, `false`
+     *   otherwise.
+     */
+    val isVibrationSupported: Boolean
+        get() = false
 }

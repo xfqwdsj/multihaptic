@@ -1,7 +1,6 @@
 package top.ltfan.multihaptic.vibrator
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import top.ltfan.multihaptic.HapticEffect
@@ -315,7 +314,6 @@ class AbstractVibratorTest {
         println("Processed ${vibrator.performedEffects.size} effects out of 20 sent rapidly")
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testRandomDelayOfIdenticalEffects() = runTest {
 
@@ -365,6 +363,26 @@ class AbstractVibratorTest {
         assertEquals(3, vibrator.performedEffects.size, "Expected 3 effects to be performed")
         vibrator.performedEffects.forEach { performedEffect ->
             assertEquals(2, performedEffect.primitives.size, "Each effect should have 2 primitives")
+        }
+    }
+
+    @Test
+    fun testIsVibrationSupportedDefaultFalse() {
+        // StubVibrator should return false for isVibrationSupported
+        val stubVibrator = StubVibrator()
+        assertEquals(false, stubVibrator.isVibrationSupported, "StubVibrator should not support vibration")
+    }
+
+    @Test
+    fun testIsVibrationSupportedForTestVibrator() = runTest {
+        // TestVibrator (extends AbstractVibrator) should return false by default
+        val testVibrator = TestVibrator(this)
+        testVibrator.use {
+            assertEquals(
+                false,
+                testVibrator.isVibrationSupported,
+                "TestVibrator should not support vibration by default",
+            )
         }
     }
 }

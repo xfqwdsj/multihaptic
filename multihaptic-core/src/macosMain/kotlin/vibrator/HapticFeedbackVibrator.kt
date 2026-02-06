@@ -2,14 +2,20 @@ package top.ltfan.multihaptic.vibrator
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import platform.AppKit.*
+import platform.AppKit.NSHapticFeedbackManager
+import platform.AppKit.NSHapticFeedbackPatternAlignment
+import platform.AppKit.NSHapticFeedbackPatternGeneric
+import platform.AppKit.NSHapticFeedbackPatternLevelChange
+import platform.AppKit.NSHapticFeedbackPerformanceTimeNow
 import top.ltfan.multihaptic.BasicPrimitive
 import top.ltfan.multihaptic.HapticEffect
 import top.ltfan.multihaptic.PrimitiveType
 import top.ltfan.multihaptic.unpack
 
 class HapticFeedbackVibrator internal constructor(coroutineScope: CoroutineScope) : AbstractVibrator(coroutineScope) {
-    private val feedbackPerformer = NSHapticFeedbackManager.Companion.defaultPerformer
+    private val feedbackPerformer = NSHapticFeedbackManager.defaultPerformer
+
+    override val isVibrationSupported = true
 
     override suspend fun perform(effect: HapticEffect) {
         effect.unpack { it.feedback() }

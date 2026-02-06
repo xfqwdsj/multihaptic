@@ -106,6 +106,10 @@ kotlin {
             dependsOn(supportedMain)
         }
 
+        val appleTest by getting {
+            dependsOn(supportedTest)
+        }
+
         val appleCoreHapticsMain by creating {
             dependsOn(appleMain)
             dependencies {
@@ -129,6 +133,10 @@ kotlin {
             dependsOn(supportedMain)
         }
 
+        val linuxTest by getting {
+            dependsOn(supportedTest)
+        }
+
         val mingwMain by getting {
             dependsOn(unsupportedMain)
         }
@@ -137,8 +145,16 @@ kotlin {
             dependsOn(supportedMain)
         }
 
+        val browserTest by creating {
+            dependsOn(supportedTest)
+        }
+
         val jsMain by getting {
             dependsOn(browserMain)
+        }
+
+        val jsTest by getting {
+            dependsOn(browserTest)
         }
 
         val wasmJsMain by getting {
@@ -146,6 +162,10 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinx.browser)
             }
+        }
+
+        val wasmJsTest by getting {
+            dependsOn(browserTest)
         }
     }
 

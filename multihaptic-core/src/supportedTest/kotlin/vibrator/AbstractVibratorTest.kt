@@ -367,4 +367,20 @@ class AbstractVibratorTest {
             assertEquals(2, performedEffect.primitives.size, "Each effect should have 2 primitives")
         }
     }
+
+    @Test
+    fun testIsVibrationSupportedDefaultFalse() {
+        // StubVibrator should return false for isVibrationSupported
+        val stubVibrator = StubVibrator()
+        assertEquals(false, stubVibrator.isVibrationSupported(), "StubVibrator should not support vibration")
+    }
+
+    @Test
+    fun testIsVibrationSupportedForTestVibrator() = runTest {
+        // TestVibrator (extends AbstractVibrator) should return false by default
+        val testVibrator = TestVibrator(this)
+        testVibrator.use {
+            assertEquals(false, testVibrator.isVibrationSupported(), "TestVibrator should not support vibration by default")
+        }
+    }
 }

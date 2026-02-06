@@ -1,7 +1,6 @@
 package top.ltfan.multihaptic.vibrator
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import top.ltfan.multihaptic.HapticEffect
@@ -315,7 +314,6 @@ class AbstractVibratorTest {
         println("Processed ${vibrator.performedEffects.size} effects out of 20 sent rapidly")
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testRandomDelayOfIdenticalEffects() = runTest {
 

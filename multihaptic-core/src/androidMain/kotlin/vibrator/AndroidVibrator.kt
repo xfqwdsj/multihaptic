@@ -161,7 +161,7 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
                     val intensity = getValueAt(time, curves.intensity)
                     val sharpness = getValueAt(time, curves.sharpness)
                     controlPoints.add(
-                        EnvelopeVibrationEffectBuilder.PointData(intensity, sharpness) to time + timeShift
+                        EnvelopeVibrationEffectBuilder.PointData(intensity, sharpness) to time + timeShift,
                     )
                 }
 
@@ -266,8 +266,8 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
                 val intensityCurve = buildList {
                     val first = curves.intensity.first()
                     val last = curves.intensity.last()
-                    if (first.time != Duration.Companion.ZERO) {
-                        add(HapticCurves.Keyframe(Duration.Companion.ZERO, first.value))
+                    if (first.time != Duration.ZERO) {
+                        add(HapticCurves.Keyframe(Duration.ZERO, first.value))
                     }
                     addAll(curves.intensity)
                     if (last.time != duration) {
@@ -288,7 +288,7 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
                 }
 
                 VibrationEffect.createWaveform(
-                    times.toLongArray(), amplitudes.toIntArray(), -1
+                    times.toLongArray(), amplitudes.toIntArray(), -1,
                 )
             }
         }
@@ -341,8 +341,8 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
                 val times = mutableListOf<Long>()
 
                 val intensityCurve = mutableListOf<HapticCurves.Keyframe>().apply {
-                    if (curves.intensity.first().time != Duration.Companion.ZERO) {
-                        add(HapticCurves.Keyframe(Duration.Companion.ZERO, 0f))
+                    if (curves.intensity.first().time != Duration.ZERO) {
+                        add(HapticCurves.Keyframe(Duration.ZERO, 0f))
                     }
                     addAll(curves.intensity)
                 }

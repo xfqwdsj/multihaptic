@@ -31,7 +31,8 @@ interface Vibrator {
     /**
      * Checks if vibration is supported on this platform/device.
      *
-     * @return `true` if vibration hardware and API are available, `false` otherwise.
+     * @return `true` if vibration hardware and API are available, `false`
+     *   otherwise.
      */
     fun isVibrationSupported(): Boolean = false
 }

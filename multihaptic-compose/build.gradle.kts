@@ -20,7 +20,7 @@ kotlin {
         }
     }
     android {
-        namespace = "top.ltfan.multihaptic"
+        namespace = "top.ltfan.multihaptic.compose"
         compileSdk = 36
         minSdk = 21
 

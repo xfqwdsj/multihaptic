@@ -13,7 +13,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "top.ltfan.multihaptic"
+        namespace = "top.ltfan.multihaptic.platform_dsl"
         compileSdk = 36
         minSdk = 21
 

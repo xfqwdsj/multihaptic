@@ -27,7 +27,6 @@ kotlin {
             }
         }
     }
-    macosX64()
     macosArm64()
     iosSimulatorArm64()
     iosX64()
@@ -35,12 +34,10 @@ kotlin {
     linuxX64()
     linuxArm64()
     watchosSimulatorArm64()
-    watchosX64()
     watchosArm32()
     watchosArm64()
     watchosDeviceArm64()
     tvosSimulatorArm64()
-    tvosX64()
     tvosArm64()
     mingwX64()
     js { browser() }

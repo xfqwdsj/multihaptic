@@ -32,13 +32,11 @@ kotlin {
             }
         }
     }
-    macosX64()
     macosArm64()
     iosSimulatorArm64()
     iosX64()
     iosArm64()
     tvosSimulatorArm64()
-    tvosX64()
     tvosArm64()
     js { browser() }
     @OptIn(ExperimentalWasmDsl::class) wasmJs { browser() }

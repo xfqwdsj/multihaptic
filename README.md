@@ -14,15 +14,28 @@ The `multihaptic` library contains these modules:
 - `multihaptic-apple-corehaptics-dsl`: Core Haptics DSL with a shared Kotlin model and conversion to Apple Core Haptics
   objects.
 
-Add the modules you use to your Kotlin Multiplatform project's `build.gradle.kts`:
+Add the modules you use to the matching source sets in your Kotlin Multiplatform project's `build.gradle.kts`:
 
 ```kotlin
-dependencies {
-    implementation("top.ltfan.multihaptic:multihaptic-core:<version>") // Core API, also exposed by the Compose module
-    implementation("top.ltfan.multihaptic:multihaptic-compose:<version>") // For Compose support
-
-    implementation("top.ltfan.multihaptic:multihaptic-android-dsl:<version>") // Android effect DSL
-    implementation("top.ltfan.multihaptic:multihaptic-apple-corehaptics-dsl:<version>") // Apple Core Haptics DSL
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("top.ltfan.multihaptic:multihaptic-core:<version>") // Core API, also exposed by the Compose module
+            implementation("top.ltfan.multihaptic:multihaptic-compose:<version>") // For Compose support
+        }
+        androidMain.dependencies {
+            implementation("top.ltfan.multihaptic:multihaptic-android-dsl:<version>")
+        }
+        iosMain.dependencies {
+            implementation("top.ltfan.multihaptic:multihaptic-apple-corehaptics-dsl:<version>")
+        }
+        macosMain.dependencies {
+            implementation("top.ltfan.multihaptic:multihaptic-apple-corehaptics-dsl:<version>")
+        }
+        tvosMain.dependencies {
+            implementation("top.ltfan.multihaptic:multihaptic-apple-corehaptics-dsl:<version>")
+        }
+    }
 }
 ```
 

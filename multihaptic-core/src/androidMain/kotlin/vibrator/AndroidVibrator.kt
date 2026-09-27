@@ -6,25 +6,31 @@ import android.os.Vibrator
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import platform.android.dsl.ComposedVibrationEffectBuilder
-import platform.android.dsl.EnvelopeVibrationEffectBuilder
-import platform.android.dsl.composedVibrationEffect
-import platform.android.dsl.onOffVibrationEffect
 import top.ltfan.multihaptic.BasicPrimitive
 import top.ltfan.multihaptic.DelayType
-import top.ltfan.multihaptic.HapticCurves
 import top.ltfan.multihaptic.HapticEffect
+import top.ltfan.multihaptic.Keyframe
 import top.ltfan.multihaptic.PrimitiveType
 import top.ltfan.multihaptic.duration
 import top.ltfan.multihaptic.platform.android.OffTimeOfCustomOnOffEffect
 import top.ltfan.multihaptic.platform.android.amplitudeVibrationEffect
+import top.ltfan.multihaptic.platform.android.dsl.AndroidDelayType
+import top.ltfan.multihaptic.platform.android.dsl.AndroidPrimitiveType
+import top.ltfan.multihaptic.platform.android.dsl.EnvelopePoint
+import top.ltfan.multihaptic.platform.android.dsl.after
+import top.ltfan.multihaptic.platform.android.dsl.at
+import top.ltfan.multihaptic.platform.android.dsl.composedVibrationEffect
+import top.ltfan.multihaptic.platform.android.dsl.onOffVibrationEffect
+import top.ltfan.multihaptic.platform.android.dsl.point
+import top.ltfan.multihaptic.platform.android.dsl.primitive
+import top.ltfan.multihaptic.platform.android.dsl.range
 import top.ltfan.multihaptic.platform.android.envelopeVibrationEffect
 import top.ltfan.multihaptic.unpack
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-class AndroidVibrator internal constructor(private val vibrator: Vibrator, coroutineScope: CoroutineScope) :
+public class AndroidVibrator internal constructor(private val vibrator: Vibrator, coroutineScope: CoroutineScope) :
     AbstractVibrator(coroutineScope) {
 
     override suspend fun perform(effect: HapticEffect) {
@@ -44,9 +50,9 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
         }
     }
 
-    override fun cancel() = vibrator.cancel()
+    override fun cancel(): Unit = vibrator.cancel()
 
-    override val isVibrationSupported get() = vibrator.hasVibrator()
+    override val isVibrationSupported: Boolean get() = vibrator.hasVibrator()
 
     private val HapticEffect.isComposedSupported: Boolean
         @RequiresApi(Build.VERSION_CODES.R) inline get() = primitives.all { it.basic is BasicPrimitive.Predefined } && vibrator.areAllPrimitivesSupported(
@@ -162,12 +168,12 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
                     initialSharpness = curves.sharpness.first().value
                 }
 
-                val controlPoints = mutableListOf<Pair<EnvelopeVibrationEffectBuilder.PointData, Duration>>()
+                val controlPoints = mutableListOf<Pair<EnvelopePoint, Duration>>()
                 allTimes.forEach { time ->
                     val intensity = getValueAt(time, curves.intensity)
                     val sharpness = getValueAt(time, curves.sharpness)
                     controlPoints.add(
-                        EnvelopeVibrationEffectBuilder.PointData(intensity, sharpness) to time + timeShift,
+                        EnvelopePoint(intensity, sharpness) to time + timeShift,
                     )
                 }
 
@@ -184,14 +190,14 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
 
     private val HapticEffect.composedEffect
         @RequiresApi(Build.VERSION_CODES.R) get() = composedVibrationEffect {
-            primitives.forEach { primitive ->
-                if (primitive.basic !is BasicPrimitive.Predefined) return@forEach
+            this@composedEffect.primitives.forEach { effectPrimitive ->
+                if (effectPrimitive.basic !is BasicPrimitive.Predefined) return@forEach
 
-                primitive(primitive.basic.composedPrimitiveType) {
-                    scale = primitive.basic.scale
-                    delay = primitive.delay
+                primitive(effectPrimitive.basic.composedPrimitiveType) {
+                    scale = effectPrimitive.basic.scale
+                    delay = effectPrimitive.delay
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
-                        delayType = primitive.delayType.androidDelayType
+                        delayType = effectPrimitive.delayType.androidDelayType
                     }
                 }
             }
@@ -199,27 +205,27 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
 
     private val BasicPrimitive.Predefined.composedPrimitiveType
         @RequiresApi(Build.VERSION_CODES.R) get() = when (type) {
-            PrimitiveType.Click -> ComposedVibrationEffectBuilder.PrimitiveType.Click
+            PrimitiveType.Click -> AndroidPrimitiveType.Click
             PrimitiveType.Thud -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ComposedVibrationEffectBuilder.PrimitiveType.Thud
+                AndroidPrimitiveType.Thud
             } else {
-                ComposedVibrationEffectBuilder.PrimitiveType.Click
+                AndroidPrimitiveType.Click
             }
 
             PrimitiveType.Spin -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ComposedVibrationEffectBuilder.PrimitiveType.Spin
+                AndroidPrimitiveType.Spin
             } else {
-                ComposedVibrationEffectBuilder.PrimitiveType.QuickRise
+                AndroidPrimitiveType.QuickRise
             }
 
-            PrimitiveType.QuickRise -> ComposedVibrationEffectBuilder.PrimitiveType.QuickRise
-            PrimitiveType.SlowRise -> ComposedVibrationEffectBuilder.PrimitiveType.QuickRise
-            PrimitiveType.QuickFall -> ComposedVibrationEffectBuilder.PrimitiveType.QuickFall
-            PrimitiveType.Tick -> ComposedVibrationEffectBuilder.PrimitiveType.Tick
+            PrimitiveType.QuickRise -> AndroidPrimitiveType.QuickRise
+            PrimitiveType.SlowRise -> AndroidPrimitiveType.QuickRise
+            PrimitiveType.QuickFall -> AndroidPrimitiveType.QuickFall
+            PrimitiveType.Tick -> AndroidPrimitiveType.Tick
             PrimitiveType.LowTick -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ComposedVibrationEffectBuilder.PrimitiveType.LowTick
+                AndroidPrimitiveType.LowTick
             } else {
-                ComposedVibrationEffectBuilder.PrimitiveType.Tick
+                AndroidPrimitiveType.Tick
             }
         }
 
@@ -273,11 +279,11 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
                     val first = curves.intensity.first()
                     val last = curves.intensity.last()
                     if (first.time != Duration.ZERO) {
-                        add(HapticCurves.Keyframe(Duration.ZERO, first.value))
+                        add(Keyframe(Duration.ZERO, first.value))
                     }
                     addAll(curves.intensity)
                     if (last.time != duration) {
-                        add(HapticCurves.Keyframe(duration, last.value))
+                        add(Keyframe(duration, last.value))
                     }
                 }
 
@@ -346,9 +352,9 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
             is BasicPrimitive.Custom -> {
                 val times = mutableListOf<Long>()
 
-                val intensityCurve = mutableListOf<HapticCurves.Keyframe>().apply {
+                val intensityCurve = mutableListOf<Keyframe>().apply {
                     if (curves.intensity.first().time != Duration.ZERO) {
-                        add(HapticCurves.Keyframe(Duration.ZERO, 0f))
+                        add(Keyframe(Duration.ZERO, 0f))
                     }
                     addAll(curves.intensity)
                 }
@@ -377,11 +383,11 @@ class AndroidVibrator internal constructor(private val vibrator: Vibrator, corou
 
     private val DelayType.androidDelayType
         @RequiresApi(Build.VERSION_CODES.BAKLAVA) get() = when (this) {
-            DelayType.Pause -> ComposedVibrationEffectBuilder.DelayType.Pause
-            DelayType.RelativeStartOffset -> ComposedVibrationEffectBuilder.DelayType.RelativeStartOffset
+            DelayType.Pause -> AndroidDelayType.Pause
+            DelayType.RelativeStartOffset -> AndroidDelayType.RelativeStartOffset
         }
 
-    private fun getValueAt(time: Duration, curve: List<HapticCurves.Keyframe>): Float {
+    private fun getValueAt(time: Duration, curve: List<Keyframe>): Float {
         curve.find { it.time == time }?.let { return it.value }
 
         val prev = curve.lastOrNull { it.time < time } ?: return curve.firstOrNull()?.value ?: 0f

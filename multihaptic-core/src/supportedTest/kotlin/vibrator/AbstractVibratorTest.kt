@@ -5,6 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import top.ltfan.multihaptic.HapticEffect
 import top.ltfan.multihaptic.PrimitiveType
+import top.ltfan.multihaptic.predefined
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -37,7 +38,7 @@ class AbstractVibratorTest {
                     is top.ltfan.multihaptic.BasicPrimitive.Custom -> basic.duration.inWholeMilliseconds
                 }
             }
-            delay(duration)
+            delay(duration.milliseconds)
         }
 
         override fun cancel() {

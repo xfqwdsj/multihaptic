@@ -1,6 +1,7 @@
 package top.ltfan.multihaptic.vibrator
 
 import top.ltfan.multihaptic.HapticEffect
+import top.ltfan.multihaptic.HapticEffectDsl
 
 /**
  * Represents a vibrator that can perform haptic effects.
@@ -9,24 +10,23 @@ import top.ltfan.multihaptic.HapticEffect
  * [HapticEffect], vibrate with a composed effect using a builder, and
  * cancel any ongoing vibrations.
  */
-interface Vibrator {
+public interface Vibrator {
     /**
      * Vibrates with the specified [HapticEffect].
      *
      * @param effect The [HapticEffect] to use for vibration.
      */
-    fun vibrate(effect: HapticEffect)
+    public fun vibrate(effect: HapticEffect)
 
     /**
      * Vibrates with a haptic effect defined by the provided builder block.
      *
-     * @param builder The block to configure the [HapticEffect.Builder].
+     * @param builder The block to configure the effect.
      */
-    fun vibrate(builder: HapticEffect.Builder.() -> Unit) =
-        vibrate(HapticEffect(builder))
+    public fun vibrate(builder: HapticEffectDsl.() -> Unit): Unit = vibrate(HapticEffect(builder))
 
     /** Cancels any ongoing vibrations. */
-    fun cancel()
+    public fun cancel()
 
     /**
      * Checks if vibration is supported on this platform/device.
@@ -34,6 +34,6 @@ interface Vibrator {
      * @return `true` if vibration hardware and API are available, `false`
      *   otherwise.
      */
-    val isVibrationSupported: Boolean
+    public val isVibrationSupported: Boolean
         get() = false
 }

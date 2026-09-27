@@ -10,16 +10,19 @@ The `multihaptic` library contains these modules:
 
 - `multihaptic-core`: Core functionality for haptic feedback.
 - `multihaptic-compose`: Haptic feedback support for Compose.
-- `multihaptic-platform-dsl`: Platform-specific DSL for haptic feedback.
+- `multihaptic-android-dsl`: Android vibration effect DSL.
+- `multihaptic-apple-corehaptics-dsl`: Core Haptics DSL with a shared Kotlin model and conversion to Apple Core Haptics
+  objects.
 
-To use `multihaptic` in your Kotlin Multiplatform project, add the following dependency to your `build.gradle.kts` file:
+Add the modules you use to your Kotlin Multiplatform project's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("top.ltfan.multihaptic:multihaptic-core:<version>") // Not needed if you add the Compose dependency
+    implementation("top.ltfan.multihaptic:multihaptic-core:<version>") // Core API, also exposed by the Compose module
     implementation("top.ltfan.multihaptic:multihaptic-compose:<version>") // For Compose support
 
-    implementation("top.ltfan.multihaptic:multihaptic-platform-dsl:<version>") // If you want to use the DSLs to build the haptic effects
+    implementation("top.ltfan.multihaptic:multihaptic-android-dsl:<version>") // Android effect DSL
+    implementation("top.ltfan.multihaptic:multihaptic-apple-corehaptics-dsl:<version>") // Apple Core Haptics DSL
 }
 ```
 
@@ -32,7 +35,8 @@ multihaptic = "<version>"
 [libraries]
 multihaptic = { module = "top.ltfan.multihaptic:multihaptic-core", version.ref = "multihaptic" }
 multihaptic-compose = { module = "top.ltfan.multihaptic:multihaptic-compose", version.ref = "multihaptic" }
-multihaptic-platformDsl = { module = "top.ltfan.multihaptic:multihaptic-platform-dsl", version.ref = "multihaptic" }
+multihaptic-androidDsl = { module = "top.ltfan.multihaptic:multihaptic-android-dsl", version.ref = "multihaptic" }
+multihaptic-appleCoreHapticsDsl = { module = "top.ltfan.multihaptic:multihaptic-apple-corehaptics-dsl", version.ref = "multihaptic" }
 ```
 
 Make sure your `settings.gradle.kts` includes the repository:
@@ -84,9 +88,7 @@ You can also create custom haptic effects:
 ```kotlin
 HapticEffect {
     custom {
-        fallback = PrimitiveType.Spin
-        // or
-        spinFallback
+        spinFallback // Sets the predefined fallback to PrimitiveType.Spin
 
         curves {
             intensity {
@@ -109,25 +111,24 @@ the `rememberVibrator` from a Composable function to get a `Vibrator` instance a
 
 ## Platforms
 
-| Platform                            | Predefined Effects | Advanced Custom Effects | Details                                                                              |
-|-------------------------------------|--------------------|-------------------------|--------------------------------------------------------------------------------------|
-| Android                             | ✅ Supported        | ✅ Supported             | Uses multiple vibration API; advanced composition/custom effects depend on API level |
-| iOS (CoreHaptics, 13.0+)            | ✅ Supported        | ✅ Supported             | Core Haptics for complex custom effects                                              |
-| iOS (UIKit, 10.0+)                  | ✅ Supported        | 🚫 Fallback             | UIFeedbackGenerator for predefined feedback only                                     |
-| macOS (CoreHaptics/Catalyst, 13.0+) | ✅ Supported        | ✅ Supported             | Core Haptics available for Mac Catalyst apps                                         |
-| macOS (AppKit, 10.11+)              | ✅ Supported        | 🚫 Fallback             | AppKit Haptic Feedback, only preset effects                                          |
-| watchOS                             | ✅ Supported        | 🚫 Fallback             | WatchKit haptic types, mapped to predefined effects                                  |
-| tvOS (14.0+)                        | ✅ Supported        | ✅ Supported             | Core Haptics if available                                                            |
-| Browser (Web/Js/Wasm)               | ✅ Supported        | 🚫 Fallback             | Web Vibration API, only duration-based vibration                                     |
-| Windows                             | 🚫 No effect       | 🚫 No effect            |                                                                                      |
-| Linux                               | 🚫 No effect       | 🚫 No effect            |                                                                                      |
+| Platform                    | Predefined Effects | Advanced Custom Effects | Details                                                          |
+|-----------------------------|--------------------|-------------------------|------------------------------------------------------------------|
+| Android (API 21+)           | ✅ Supported       | ✅ Supported            | Uses multiple vibration APIs; custom effects depend on API level |
+| iOS (Core Haptics, 15.0+)   | ✅ Supported       | ✅ Supported            | Core Haptics on compatible hardware                              |
+| iOS (UIKit, 15.0+)          | ✅ Supported       | 🚫 Fallback             | UIFeedbackGenerator for predefined feedback                      |
+| macOS (Core Haptics, 12.0+) | ✅ Supported       | ✅ Supported            | Apple Silicon; Core Haptics on compatible hardware               |
+| macOS (AppKit, 12.0+)       | ✅ Supported       | 🚫 Fallback             | Apple Silicon; AppKit feedback for predefined effects            |
+| watchOS (8.0+)              | ✅ Supported       | 🚫 Fallback             | WatchKit haptic types, mapped to predefined effects              |
+| tvOS (15.0+)                | ✅ Supported       | ✅ Supported            | Core Haptics on compatible hardware                              |
+| Browser (Web/Js/Wasm)       | ✅ Supported       | 🚫 Fallback             | Web Vibration API, only duration-based vibration                 |
+| Windows                     | 🚫 No effect       | 🚫 No effect            |                                                                  |
+| Linux                       | 🚫 No effect       | 🚫 No effect            |                                                                  |
 
 **Note:**
 
 - Advanced custom effects require Core Haptics (Apple) or high Android API level.
-- Browsers only support basic vibration, not custom curves.
-- If predefined effects are supported but advanced custom effects are not, the library will use the predefined effects
-  as a fallback.
+- Browser playback uses the Web Vibration API and converts effects to duration-based patterns.
+- On backends that use predefined feedback for custom effects, the configured predefined fallback is played.
 
 ## Contributing
 

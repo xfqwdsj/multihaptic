@@ -3,6 +3,15 @@ package samples.effect
 import top.ltfan.multihaptic.DelayType
 import top.ltfan.multihaptic.HapticEffect
 import top.ltfan.multihaptic.PrimitiveType
+import top.ltfan.multihaptic.at
+import top.ltfan.multihaptic.curves
+import top.ltfan.multihaptic.custom
+import top.ltfan.multihaptic.intensity
+import top.ltfan.multihaptic.lowTick
+import top.ltfan.multihaptic.predefined
+import top.ltfan.multihaptic.quickRise
+import top.ltfan.multihaptic.sharpness
+import top.ltfan.multihaptic.spinFallback
 import kotlin.time.Duration.Companion.milliseconds
 
 fun buildHapticEffect() {
@@ -25,9 +34,7 @@ fun buildHapticEffect() {
         }
         quickRise
         custom {
-            fallback = PrimitiveType.Spin
-            // or
-            spinFallback
+            spinFallback // Sets the predefined fallback to PrimitiveType.Spin
 
             curves {
                 intensity {

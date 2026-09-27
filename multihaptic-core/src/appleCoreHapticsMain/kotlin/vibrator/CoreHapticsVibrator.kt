@@ -10,20 +10,30 @@ import platform.CoreHaptics.CHHapticEngine
 import platform.CoreHaptics.CHHapticPattern
 import platform.CoreHaptics.CHHapticTimeImmediate
 import platform.Foundation.NSError
-import platform.apple.dsl.AppleError
-import platform.apple.dsl.runThrowing
 import top.ltfan.multihaptic.BasicPrimitive
 import top.ltfan.multihaptic.HapticEffect
 import top.ltfan.multihaptic.PrimitiveType
 import top.ltfan.multihaptic.duration
-import top.ltfan.multihaptic.platform.corehaptics.CHHapticPattern
+import top.ltfan.multihaptic.platform.apple.AppleError
+import top.ltfan.multihaptic.platform.apple.corehaptics.CHHapticPattern
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.add
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.at
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.continuous
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.curves
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.events
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.intensity
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.sharpness
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.transient
+import top.ltfan.multihaptic.platform.apple.runThrowing
 import top.ltfan.multihaptic.unpack
 import kotlin.time.Duration.Companion.milliseconds
 
-class CoreHapticsVibrator internal constructor(coroutineScope: CoroutineScope, private val engine: CHHapticEngine) :
-    AbstractVibrator(coroutineScope) {
+public class CoreHapticsVibrator internal constructor(
+    coroutineScope: CoroutineScope,
+    private val engine: CHHapticEngine,
+) : AbstractVibrator(coroutineScope) {
 
-    override val isVibrationSupported = true
+    override val isVibrationSupported: Boolean = true
 
     @ExperimentalForeignApi
     @BetaInteropApi

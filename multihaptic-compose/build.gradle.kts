@@ -14,6 +14,8 @@ plugins {
 }
 
 kotlin {
+    explicitApi()
+
     jvm {
         compilerOptions {
             jvmTarget = JvmTarget.JVM_11
@@ -21,7 +23,11 @@ kotlin {
     }
     android {
         namespace = "top.ltfan.multihaptic.compose"
-        compileSdk = 36
+        compileSdk {
+            version = release(37) {
+                minorApiLevel = 2
+            }
+        }
         minSdk = 21
 
         compilerOptions {
@@ -49,76 +55,80 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 api(project(":multihaptic-core"))
                 implementation(libs.compose.runtime)
             }
         }
 
-        val configUnneededMain by creating {
-            dependsOn(commonMain)
+        val configUnneededMain = create("configUnneededMain") {
+            dependsOn(commonMain.get())
         }
 
-        val supportedMain by creating {
-            dependsOn(commonMain)
+        val supportedMain = create("supportedMain") {
+            dependsOn(commonMain.get())
         }
 
-        val unsupportedMain by creating {
-            dependsOn(commonMain)
+        val unsupportedMain = create("unsupportedMain") {
+            dependsOn(commonMain.get())
             dependsOn(configUnneededMain)
         }
 
-        val jvmMain by getting {
+        jvmMain {
             dependsOn(unsupportedMain)
         }
 
-        val androidMain by getting {
+        androidMain {
             dependsOn(supportedMain)
             dependencies {
                 implementation(libs.compose.ui)
             }
         }
 
-        val appleMain by getting {
+        appleMain {
             dependsOn(supportedMain)
             dependsOn(configUnneededMain)
         }
 
-        val appleCoreHapticsMain by creating {
-            dependsOn(appleMain)
+        val appleCoreHapticsMain = create("appleCoreHapticsMain") {
+            dependsOn(appleMain.get())
         }
 
-        val macosMain by getting {
+        macosMain {
             dependsOn(appleCoreHapticsMain)
         }
 
-        val iosMain by getting {
+        iosMain {
             dependsOn(appleCoreHapticsMain)
         }
 
-        val linuxMain by getting {
+        linuxMain {
             dependsOn(supportedMain)
             dependsOn(configUnneededMain)
         }
 
-        val mingwMain by getting {
+        mingwMain {
             dependsOn(unsupportedMain)
             dependsOn(configUnneededMain)
         }
 
-        val browserMain by creating {
+        val browserMain = create("browserMain") {
             dependsOn(supportedMain)
             dependsOn(configUnneededMain)
         }
 
-        val jsMain by getting {
+        jsMain {
             dependsOn(browserMain)
         }
 
-        val wasmJsMain by getting {
+        wasmJsMain {
             dependsOn(browserMain)
         }
+    }
+
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-sensitive-resolution")
     }
 }
 

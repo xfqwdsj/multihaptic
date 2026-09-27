@@ -200,6 +200,10 @@ dependencies {
     add("kspCommonMainMetadata", libs.dslUtilities.ksp)
 }
 
+tasks.matching { it.name == "sourcesJar" || it.name.endsWith("SourcesJar") }.configureEach {
+    dependsOn("kspCommonMainKotlinMetadata")
+}
+
 dokka {
     dokkaSourceSets {
         configureEach {

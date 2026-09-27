@@ -68,6 +68,10 @@ dependencies {
     add("kspAndroid", libs.dslUtilities.ksp)
 }
 
+tasks.matching { it.name == "sourcesJar" || it.name.endsWith("SourcesJar") }.configureEach {
+    dependsOn("kspAndroidMain")
+}
+
 dokka {
     dokkaSourceSets {
         configureEach {

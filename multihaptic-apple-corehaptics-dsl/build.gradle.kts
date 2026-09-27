@@ -53,6 +53,10 @@ dependencies {
     add("kspMacosArm64", libs.dslUtilities.ksp)
 }
 
+tasks.matching { it.name == "sourcesJar" || it.name.endsWith("SourcesJar") }.configureEach {
+    dependsOn("kspKotlinMacosArm64")
+}
+
 // Generate shared DSL sources from macosArm64 and expose them to commonMain.
 // Sources: https://github.com/google/ksp/issues/1525#issuecomment-4197658943
 //          https://github.com/google/ksp/issues/1525#issuecomment-4535778859

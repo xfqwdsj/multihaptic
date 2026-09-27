@@ -3,24 +3,26 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin = "2.3.21"
+kotlin = "2.4.20"
 kotlinx-coroutines = "1.11.0"
 kotlinx-browser = "0.5.0"
-dslUtilities = "1.0.5"
-compose = "1.11.0"
-agp = "9.2.1"
-androidx = "1.18.0"
-androidx-annotation = "1.10.0"
+dslUtilities = "2.1.0"
+ksp = "2.3.12"
+compose = "1.12.1"
+agp = "9.4.1"
+androidx = "1.19.1"
+androidx-annotation = "1.11.0"
 androidx-test-runner = "1.7.0"
 androidx-test-junit = "1.3.0"
 dokka = "2.2.0"
-mavenPublish = "0.36.0"
+mavenPublish = "0.37.0"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 dslUtilities = { module = "top.ltfan.dslutilities:dsl-utilities", version.ref = "dslUtilities" }
+dslUtilities-ksp = { module = "top.ltfan.dslutilities:dsl-utilities-ksp", version.ref = "dslUtilities" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx" }
@@ -36,5 +38,6 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }

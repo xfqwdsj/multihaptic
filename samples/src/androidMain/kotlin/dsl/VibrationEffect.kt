@@ -1,8 +1,30 @@
+@file:Suppress("unused")
+
 package samples.dsl
 
 import android.annotation.SuppressLint
 import android.content.Context
-import platform.android.dsl.*
+import top.ltfan.multihaptic.platform.android.dsl.after
+import top.ltfan.multihaptic.platform.android.dsl.amplitudeVibrationEffect
+import top.ltfan.multihaptic.platform.android.dsl.at
+import top.ltfan.multihaptic.platform.android.dsl.click
+import top.ltfan.multihaptic.platform.android.dsl.composedVibrationEffect
+import top.ltfan.multihaptic.platform.android.dsl.envelopeVibrationEffect
+import top.ltfan.multihaptic.platform.android.dsl.lowTick
+import top.ltfan.multihaptic.platform.android.dsl.onOffVibrationEffect
+import top.ltfan.multihaptic.platform.android.dsl.pattern
+import top.ltfan.multihaptic.platform.android.dsl.point
+import top.ltfan.multihaptic.platform.android.dsl.quickFall
+import top.ltfan.multihaptic.platform.android.dsl.quickRise
+import top.ltfan.multihaptic.platform.android.dsl.range
+import top.ltfan.multihaptic.platform.android.dsl.relativeStartOffsetDelay
+import top.ltfan.multihaptic.platform.android.dsl.slowRise
+import top.ltfan.multihaptic.platform.android.dsl.spin
+import top.ltfan.multihaptic.platform.android.dsl.thud
+import top.ltfan.multihaptic.platform.android.dsl.tick
+import top.ltfan.multihaptic.platform.android.dsl.tryWithVibrator
+import top.ltfan.multihaptic.platform.android.dsl.waveformVibrationEffect
+import top.ltfan.multihaptic.platform.android.dsl.withVibratorOrNull
 import kotlin.time.Duration.Companion.milliseconds
 
 @SuppressLint("NewApi")

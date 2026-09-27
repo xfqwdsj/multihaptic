@@ -1,8 +1,17 @@
+@file:Suppress("unused")
+
 package samples.dsl
 
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
-import platform.CoreHaptics.dsl.CHHapticPattern
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.CHHapticPattern
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.at
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.continuous
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.curves
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.events
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.intensity
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.sharpness
+import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.transient
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)

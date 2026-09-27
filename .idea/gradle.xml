@@ -5,12 +5,14 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="temurin-25" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/multihaptic-android-dsl" />
+            <option value="$PROJECT_DIR$/multihaptic-apple-corehaptics-dsl" />
             <option value="$PROJECT_DIR$/multihaptic-compose" />
             <option value="$PROJECT_DIR$/multihaptic-core" />
-            <option value="$PROJECT_DIR$/multihaptic-platform-dsl" />
             <option value="$PROJECT_DIR$/samples" />
           </set>
         </option>

@@ -5,7 +5,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import top.ltfan.multihaptic.HapticEffect
 
-abstract class AbstractVibrator internal constructor(coroutineScope: CoroutineScope) : StubVibrator(), AutoCloseable {
+public abstract class AbstractVibrator internal constructor(coroutineScope: CoroutineScope) : StubVibrator(),
+    AutoCloseable {
     private val effectChannel = Channel<HapticEffect>(Channel.CONFLATED)
 
     init {

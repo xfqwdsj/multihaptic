@@ -4,12 +4,12 @@ import kotlinx.browser.window
 import kotlin.time.Duration
 
 internal actual fun vibrate(duration: Duration) {
-    if (isVibrateSupported()) {
+    if (isVibrationSupported()) {
         window.navigator.vibrate(duration.inWholeMilliseconds.toInt())
     }
 }
 
-internal actual fun isVibrateSupported(): Boolean = checkVibrateSupported()
+internal actual fun isVibrationSupported(): Boolean = checkVibrateSupported()
 
 @OptIn(ExperimentalWasmJsInterop::class)
 @JsFun("() => typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function'")

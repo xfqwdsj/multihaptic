@@ -8,10 +8,13 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.dokka)
     alias(libs.plugins.mavenPublish)
+    alias(libs.plugins.ksp)
     signing
 }
 
 kotlin {
+    explicitApi()
+
     jvm {
         compilerOptions {
             jvmTarget = JvmTarget.JVM_1_8
@@ -19,7 +22,11 @@ kotlin {
     }
     android {
         namespace = "top.ltfan.multihaptic.core"
-        compileSdk = 36
+        compileSdk {
+            version = release(37) {
+                minorApiLevel = 2
+            }
+        }
         minSdk = 21
 
         withHostTest {
@@ -27,7 +34,7 @@ kotlin {
         }
 
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_1_8
+            jvmTarget = JvmTarget.JVM_11
         }
 
         packaging {
@@ -49,20 +56,26 @@ kotlin {
     tvosSimulatorArm64()
     tvosArm64()
     mingwX64()
-    js { browser() }
-    @OptIn(ExperimentalWasmDsl::class) wasmJs { browser() }
+    js {
+        browser()
+    }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     applyDefaultHierarchyTemplate()
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
+            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
             dependencies {
                 implementation(libs.kotlinx.coroutines.core)
                 api(libs.dslUtilities)
             }
         }
 
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.kotlinx.coroutines.core)
@@ -70,106 +83,121 @@ kotlin {
             }
         }
 
-        val supportedMain by creating {
-            dependsOn(commonMain)
+        val supportedMain = create("supportedMain") {
+            dependsOn(commonMain.get())
         }
 
-        val supportedTest by creating {
-            dependsOn(commonTest)
+        val supportedTest = create("supportedTest") {
+            dependsOn(commonTest.get())
         }
 
-        val unsupportedMain by creating {
-            dependsOn(commonMain)
+        val unsupportedMain = create("unsupportedMain") {
+            dependsOn(commonMain.get())
         }
 
-        val jvmMain by getting {
+        jvmMain {
             dependsOn(unsupportedMain)
         }
 
-        val androidMain by getting {
+        androidMain {
             dependsOn(supportedMain)
             dependencies {
-                implementation(project(":multihaptic-platform-dsl"))
+                implementation(project(":multihaptic-android-dsl"))
                 implementation(libs.androidx.core)
                 implementation(libs.androidx.annotation)
             }
         }
 
-        val androidHostTest by getting {
+        getByName("androidHostTest") {
             dependsOn(supportedTest)
         }
 
-        val appleMain by getting {
+        appleMain {
             dependsOn(supportedMain)
         }
 
-        val appleTest by getting {
+        appleTest {
             dependsOn(supportedTest)
         }
 
-        val appleCoreHapticsMain by creating {
-            dependsOn(appleMain)
+        val appleCoreHapticsMain = create("appleCoreHapticsMain") {
+            dependsOn(appleMain.get())
             dependencies {
-                implementation(project(":multihaptic-platform-dsl"))
+                implementation(project(":multihaptic-apple-corehaptics-dsl"))
             }
         }
 
-        val macosMain by getting {
+        macosMain {
             dependsOn(appleCoreHapticsMain)
         }
 
-        val iosMain by getting {
+        iosMain {
             dependsOn(appleCoreHapticsMain)
         }
 
-        val tvosMain by getting {
+        tvosMain {
             dependsOn(appleCoreHapticsMain)
         }
 
-        val linuxMain by getting {
+        linuxMain {
             dependsOn(supportedMain)
         }
 
-        val linuxTest by getting {
+        linuxTest {
             dependsOn(supportedTest)
         }
 
-        val mingwMain by getting {
+        mingwMain {
             dependsOn(unsupportedMain)
         }
 
-        val browserMain by creating {
+        val browserMain = create("browserMain") {
             dependsOn(supportedMain)
         }
 
-        val browserTest by creating {
+        val browserTest = create("browserTest") {
             dependsOn(supportedTest)
         }
 
-        val jsMain by getting {
+        jsMain {
             dependsOn(browserMain)
         }
 
-        val jsTest by getting {
+        jsTest {
             dependsOn(browserTest)
         }
 
-        val wasmJsMain by getting {
+        wasmJsMain {
             dependsOn(browserMain)
             dependencies {
                 implementation(libs.kotlinx.browser)
             }
         }
 
-        val wasmJsTest by getting {
+        wasmJsTest {
             dependsOn(browserTest)
         }
     }
 
     compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
         freeCompilerArgs.add("-Xcontext-sensitive-resolution")
     }
+}
+
+tasks.configureEach {
+    if (name.startsWith("ksp") && name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", libs.dslUtilities.ksp)
 }
 
 dokka {

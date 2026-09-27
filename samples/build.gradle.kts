@@ -14,11 +14,15 @@ kotlin {
     }
     android {
         namespace = "top.ltfan.multihaptic"
-        compileSdk = 36
+        compileSdk {
+            version = release(37) {
+                minorApiLevel = 2
+            }
+        }
         minSdk = 21
 
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_1_8
+            jvmTarget = JvmTarget.JVM_11
         }
 
         packaging {
@@ -40,83 +44,88 @@ kotlin {
     tvosSimulatorArm64()
     tvosArm64()
     mingwX64()
-    js { browser() }
-    @OptIn(ExperimentalWasmDsl::class) wasmJs { browser() }
+    js {
+        browser()
+    }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     applyDefaultHierarchyTemplate()
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":multihaptic-core"))
             }
         }
 
-        val supportedMain by creating {
-            dependsOn(commonMain)
+        val supportedMain = create("supportedMain") {
+            dependsOn(commonMain.get())
         }
 
-        val unsupportedMain by creating {
-            dependsOn(commonMain)
+        val unsupportedMain = create("unsupportedMain") {
+            dependsOn(commonMain.get())
         }
 
-        val jvmMain by getting {
+        jvmMain {
             dependsOn(unsupportedMain)
         }
 
-        val androidMain by getting {
+        androidMain {
             dependsOn(supportedMain)
             dependencies {
-                implementation(project(":multihaptic-platform-dsl"))
+                implementation(project(":multihaptic-android-dsl"))
             }
         }
 
-        val appleMain by getting {
+        appleMain {
             dependsOn(supportedMain)
         }
 
-        val appleCoreHapticsMain by creating {
-            dependsOn(appleMain)
+        val appleCoreHapticsMain = create("appleCoreHapticsMain") {
+            dependsOn(appleMain.get())
             dependencies {
-                implementation(project(":multihaptic-platform-dsl"))
+                implementation(project(":multihaptic-apple-corehaptics-dsl"))
             }
         }
 
-        val macosMain by getting {
+        macosMain {
             dependsOn(appleCoreHapticsMain)
         }
 
-        val iosMain by getting {
+        iosMain {
             dependsOn(appleCoreHapticsMain)
         }
 
-        val tvosMain by getting {
+        tvosMain {
             dependsOn(appleCoreHapticsMain)
         }
 
-        val linuxMain by getting {
+        linuxMain {
             dependsOn(supportedMain)
         }
 
-        val mingwMain by getting {
+        mingwMain {
             dependsOn(unsupportedMain)
         }
 
-        val browserMain by creating {
+        val browserMain = create("browserMain") {
             dependsOn(supportedMain)
         }
 
-        val jsMain by getting {
+        jsMain {
             dependsOn(browserMain)
         }
 
-        val wasmJsMain by getting {
+        wasmJsMain {
             dependsOn(browserMain)
         }
     }
 
     compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
+        freeCompilerArgs.add("-Xcontext-sensitive-resolution")
     }
 }
 

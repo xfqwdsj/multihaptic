@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.spotless)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.dokka)
     alias(libs.plugins.mavenPublish)
@@ -13,6 +14,10 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
     explicitApi()
 
     jvm {
@@ -23,9 +28,10 @@ kotlin {
     android {
         namespace = "top.ltfan.multihaptic.core"
         compileSdk {
-            version = release(37) {
-                minorApiLevel = 2
-            }
+            version =
+                release(37) {
+                    minorApiLevel = 2
+                }
         }
         minSdk = 21
 
@@ -83,17 +89,20 @@ kotlin {
             }
         }
 
-        val supportedMain = create("supportedMain") {
-            dependsOn(commonMain.get())
-        }
+        val supportedMain =
+            create("supportedMain") {
+                dependsOn(commonMain.get())
+            }
 
-        val supportedTest = create("supportedTest") {
-            dependsOn(commonTest.get())
-        }
+        val supportedTest =
+            create("supportedTest") {
+                dependsOn(commonTest.get())
+            }
 
-        val unsupportedMain = create("unsupportedMain") {
-            dependsOn(commonMain.get())
-        }
+        val unsupportedMain =
+            create("unsupportedMain") {
+                dependsOn(commonMain.get())
+            }
 
         jvmMain {
             dependsOn(unsupportedMain)
@@ -120,12 +129,13 @@ kotlin {
             dependsOn(supportedTest)
         }
 
-        val appleCoreHapticsMain = create("appleCoreHapticsMain") {
-            dependsOn(appleMain.get())
-            dependencies {
-                implementation(project(":multihaptic-apple-corehaptics-dsl"))
+        val appleCoreHapticsMain =
+            create("appleCoreHapticsMain") {
+                dependsOn(appleMain.get())
+                dependencies {
+                    implementation(project(":multihaptic-apple-corehaptics-dsl"))
+                }
             }
-        }
 
         macosMain {
             dependsOn(appleCoreHapticsMain)
@@ -151,13 +161,15 @@ kotlin {
             dependsOn(unsupportedMain)
         }
 
-        val browserMain = create("browserMain") {
-            dependsOn(supportedMain)
-        }
+        val browserMain =
+            create("browserMain") {
+                dependsOn(supportedMain)
+            }
 
-        val browserTest = create("browserTest") {
-            dependsOn(supportedTest)
-        }
+        val browserTest =
+            create("browserTest") {
+                dependsOn(supportedTest)
+            }
 
         jsMain {
             dependsOn(browserMain)
@@ -200,18 +212,32 @@ dependencies {
     add("kspCommonMainMetadata", libs.dslUtilities.ksp)
 }
 
-tasks.matching { it.name == "sourcesJar" || it.name.endsWith("SourcesJar") }.configureEach {
-    dependsOn("kspCommonMainKotlinMetadata")
-}
+tasks
+    .matching { it.name == "sourcesJar" || it.name.endsWith("SourcesJar") }
+    .configureEach {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
 
 dokka {
     dokkaSourceSets {
         configureEach {
             samples.from(rootDir.resolve("samples/src/$name/kotlin"))
             sourceLink {
-                remoteUrl = uri("https://github.com/xfqwdsj/multihaptic/tree/v${version}/${project.name}")
+                remoteUrl =
+                    uri("https://github.com/xfqwdsj/multihaptic/tree/v${version}/${project.name}")
             }
         }
+    }
+}
+
+spotless {
+    kotlin {
+        target("src/*/kotlin/**/*.kt")
+        ktfmt().kotlinlangStyle()
+    }
+
+    kotlinGradle {
+        ktfmt().kotlinlangStyle()
     }
 }
 
@@ -221,7 +247,8 @@ mavenPublishing {
 
     pom {
         name = project.name
-        description = "A Kotlin multiplatform library for haptic feedback across multiple platforms."
+        description =
+            "A Kotlin multiplatform library for haptic feedback across multiple platforms."
         url = "https://github.com/xfqwdsj/multihaptic"
 
         licenses {

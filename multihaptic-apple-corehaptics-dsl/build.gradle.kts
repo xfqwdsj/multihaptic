@@ -3,6 +3,7 @@ import com.vanniktech.maven.publish.KotlinMultiplatform
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.spotless)
     alias(libs.plugins.dokka)
     alias(libs.plugins.mavenPublish)
     alias(libs.plugins.ksp)
@@ -53,16 +54,22 @@ dependencies {
     add("kspMacosArm64", libs.dslUtilities.ksp)
 }
 
-tasks.matching { it.name == "sourcesJar" || it.name.endsWith("SourcesJar") }.configureEach {
-    dependsOn("kspKotlinMacosArm64")
-}
+tasks
+    .matching { it.name == "sourcesJar" || it.name.endsWith("SourcesJar") }
+    .configureEach {
+        dependsOn("kspKotlinMacosArm64")
+    }
 
 // Generate shared DSL sources from macosArm64 and expose them to commonMain.
 // Sources: https://github.com/google/ksp/issues/1525#issuecomment-4197658943
 //          https://github.com/google/ksp/issues/1525#issuecomment-4535778859
 afterEvaluate {
     val generatedSources =
-        layout.buildDirectory.dir("generated/ksp/macosArm64/macosArm64Main/kotlin").get().asFile.canonicalFile
+        layout.buildDirectory
+            .dir("generated/ksp/macosArm64/macosArm64Main/kotlin")
+            .get()
+            .asFile
+            .canonicalFile
     val macosArm64Main = kotlin.sourceSets.getByName("macosArm64Main").kotlin
     macosArm64Main.setSrcDirs(
         macosArm64Main.srcDirs.filterNot { it.canonicalFile == generatedSources },
@@ -74,9 +81,21 @@ dokka {
         configureEach {
             samples.from(rootDir.resolve("samples/src/$name/kotlin"))
             sourceLink {
-                remoteUrl = uri("https://github.com/xfqwdsj/multihaptic/tree/v${version}/${project.name}")
+                remoteUrl =
+                    uri("https://github.com/xfqwdsj/multihaptic/tree/v${version}/${project.name}")
             }
         }
+    }
+}
+
+spotless {
+    kotlin {
+        target("src/*/kotlin/**/*.kt")
+        ktfmt().kotlinlangStyle()
+    }
+
+    kotlinGradle {
+        ktfmt().kotlinlangStyle()
     }
 }
 
@@ -86,7 +105,8 @@ mavenPublishing {
 
     pom {
         name = project.name
-        description = "A Kotlin multiplatform library for haptic feedback across multiple platforms."
+        description =
+            "A Kotlin multiplatform library for haptic feedback across multiple platforms."
         url = "https://github.com/xfqwdsj/multihaptic"
 
         licenses {

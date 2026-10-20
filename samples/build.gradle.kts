@@ -3,10 +3,15 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.spotless)
     alias(libs.plugins.androidLibrary)
 }
 
 kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
     jvm {
         compilerOptions {
             jvmTarget = JvmTarget.JVM_1_8
@@ -15,9 +20,10 @@ kotlin {
     android {
         namespace = "top.ltfan.multihaptic"
         compileSdk {
-            version = release(37) {
-                minorApiLevel = 2
-            }
+            version =
+                release(37) {
+                    minorApiLevel = 2
+                }
         }
         minSdk = 21
 
@@ -61,13 +67,15 @@ kotlin {
             }
         }
 
-        val supportedMain = create("supportedMain") {
-            dependsOn(commonMain.get())
-        }
+        val supportedMain =
+            create("supportedMain") {
+                dependsOn(commonMain.get())
+            }
 
-        val unsupportedMain = create("unsupportedMain") {
-            dependsOn(commonMain.get())
-        }
+        val unsupportedMain =
+            create("unsupportedMain") {
+                dependsOn(commonMain.get())
+            }
 
         jvmMain {
             dependsOn(unsupportedMain)
@@ -84,12 +92,13 @@ kotlin {
             dependsOn(supportedMain)
         }
 
-        val appleCoreHapticsMain = create("appleCoreHapticsMain") {
-            dependsOn(appleMain.get())
-            dependencies {
-                implementation(project(":multihaptic-apple-corehaptics-dsl"))
+        val appleCoreHapticsMain =
+            create("appleCoreHapticsMain") {
+                dependsOn(appleMain.get())
+                dependencies {
+                    implementation(project(":multihaptic-apple-corehaptics-dsl"))
+                }
             }
-        }
 
         macosMain {
             dependsOn(appleCoreHapticsMain)
@@ -111,9 +120,10 @@ kotlin {
             dependsOn(unsupportedMain)
         }
 
-        val browserMain = create("browserMain") {
-            dependsOn(supportedMain)
-        }
+        val browserMain =
+            create("browserMain") {
+                dependsOn(supportedMain)
+            }
 
         jsMain {
             dependsOn(browserMain)
@@ -130,3 +140,14 @@ kotlin {
 }
 
 group = "top.ltfan.multihaptic"
+
+spotless {
+    kotlin {
+        target("src/*/kotlin/**/*.kt")
+        ktfmt().kotlinlangStyle()
+    }
+
+    kotlinGradle {
+        ktfmt().kotlinlangStyle()
+    }
+}

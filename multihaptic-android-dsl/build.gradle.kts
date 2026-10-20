@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.spotless)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.dokka)
     alias(libs.plugins.mavenPublish)
@@ -12,14 +13,19 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
     explicitApi()
 
     android {
         namespace = "top.ltfan.multihaptic.platform.android.dsl"
         compileSdk {
-            version = release(37) {
-                minorApiLevel = 2
-            }
+            version =
+                release(37) {
+                    minorApiLevel = 2
+                }
         }
         minSdk = 21
         withDeviceTest {
@@ -68,18 +74,32 @@ dependencies {
     add("kspAndroid", libs.dslUtilities.ksp)
 }
 
-tasks.matching { it.name == "sourcesJar" || it.name.endsWith("SourcesJar") }.configureEach {
-    dependsOn("kspAndroidMain")
-}
+tasks
+    .matching { it.name == "sourcesJar" || it.name.endsWith("SourcesJar") }
+    .configureEach {
+        dependsOn("kspAndroidMain")
+    }
 
 dokka {
     dokkaSourceSets {
         configureEach {
             samples.from(rootDir.resolve("samples/src/$name/kotlin"))
             sourceLink {
-                remoteUrl = uri("https://github.com/xfqwdsj/multihaptic/tree/v${version}/${project.name}")
+                remoteUrl =
+                    uri("https://github.com/xfqwdsj/multihaptic/tree/v${version}/${project.name}")
             }
         }
+    }
+}
+
+spotless {
+    kotlin {
+        target("src/*/kotlin/**/*.kt")
+        ktfmt().kotlinlangStyle()
+    }
+
+    kotlinGradle {
+        ktfmt().kotlinlangStyle()
     }
 }
 
@@ -89,7 +109,8 @@ mavenPublishing {
 
     pom {
         name = project.name
-        description = "A Kotlin multiplatform library for haptic feedback across multiple platforms."
+        description =
+            "A Kotlin multiplatform library for haptic feedback across multiple platforms."
         url = "https://github.com/xfqwdsj/multihaptic"
 
         licenses {

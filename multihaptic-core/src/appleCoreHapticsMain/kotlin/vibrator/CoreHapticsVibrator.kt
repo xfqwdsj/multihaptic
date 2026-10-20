@@ -1,5 +1,6 @@
 package top.ltfan.multihaptic.vibrator
 
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -26,9 +27,9 @@ import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.sharpness
 import top.ltfan.multihaptic.platform.apple.corehaptics.dsl.transient
 import top.ltfan.multihaptic.platform.apple.runThrowing
 import top.ltfan.multihaptic.unpack
-import kotlin.time.Duration.Companion.milliseconds
 
-public class CoreHapticsVibrator internal constructor(
+public class CoreHapticsVibrator
+internal constructor(
     coroutineScope: CoroutineScope,
     private val engine: CHHapticEngine,
 ) : AbstractVibrator(coroutineScope) {
@@ -39,17 +40,20 @@ public class CoreHapticsVibrator internal constructor(
     @BetaInteropApi
     override suspend fun perform(effect: HapticEffect) {
         effect.unpack { basic ->
-            val pattern = basic.toPattern() ?: run {
-                delay(basic.duration)
-                return@unpack
-            }
+            val pattern =
+                basic.toPattern()
+                    ?: run {
+                        delay(basic.duration)
+                        return@unpack
+                    }
 
-            val player = try {
-                runThrowing { engine.createPlayerWithPattern(pattern, it) }
-            } catch (e: AppleError) {
-                e.printNSErrorInfo()
-                return@unpack
-            }
+            val player =
+                try {
+                    runThrowing { engine.createPlayerWithPattern(pattern, it) }
+                } catch (e: AppleError) {
+                    e.printNSErrorInfo()
+                    return@unpack
+                }
 
             try {
                 runThrowing { player?.startAtTime(CHHapticTimeImmediate, it) }
@@ -63,126 +67,143 @@ public class CoreHapticsVibrator internal constructor(
     @BetaInteropApi
     private fun BasicPrimitive.toPattern() = patternOrNull {
         when (this) {
-            is BasicPrimitive.Predefined -> when (type) {
-                PrimitiveType.Click -> CHHapticPattern(scale) {
-                    events {
-                        transient {
-                            intensity = .8f
-                            sharpness = 1f
+            is BasicPrimitive.Predefined ->
+                when (type) {
+                    PrimitiveType.Click ->
+                        CHHapticPattern(scale) {
+                            events {
+                                transient {
+                                    intensity = .8f
+                                    sharpness = 1f
+                                }
+                            }
                         }
-                    }
+
+                    PrimitiveType.Thud ->
+                        CHHapticPattern(scale) {
+                            events {
+                                transient {
+                                    intensity = 1f
+                                    sharpness = .6f
+                                }
+                                continuous(60.milliseconds, 20.milliseconds) {
+                                    intensity = .5f
+                                    sharpness = .2f
+                                }
+                            }
+                        }
+
+                    PrimitiveType.Spin ->
+                        CHHapticPattern(scale) {
+                            events {
+                                continuous(120.milliseconds) {
+                                    sharpness = .4f
+                                }
+                            }
+                            curves {
+                                intensity {
+                                    .2f at 0.milliseconds
+                                    .8f at 40.milliseconds
+                                    .7f at 80.milliseconds
+                                    .0f at 120.milliseconds
+                                }
+                            }
+                        }
+
+                    PrimitiveType.QuickRise ->
+                        CHHapticPattern(scale) {
+                            events { continuous(50.milliseconds) }
+                            curves {
+                                intensity {
+                                    .1f at 0.milliseconds
+                                    1f at 50.milliseconds
+                                }
+                                sharpness {
+                                    .2f at 0.milliseconds
+                                    1f at 50.milliseconds
+                                }
+                            }
+                        }
+
+                    PrimitiveType.SlowRise ->
+                        CHHapticPattern(scale) {
+                            events { continuous(200.milliseconds) }
+                            curves {
+                                intensity {
+                                    .1f at 0.milliseconds
+                                    .7f at 200.milliseconds
+                                }
+                                sharpness {
+                                    .1f at 0.milliseconds
+                                    .5f at 200.milliseconds
+                                }
+                            }
+                        }
+
+                    PrimitiveType.QuickFall ->
+                        CHHapticPattern(scale) {
+                            events { continuous(60.milliseconds) }
+                            curves {
+                                intensity {
+                                    1f at 0.milliseconds
+                                    .2f at 60.milliseconds
+                                }
+                                sharpness {
+                                    1f at 0.milliseconds
+                                    .2f at 60.milliseconds
+                                }
+                            }
+                        }
+
+                    PrimitiveType.Tick ->
+                        CHHapticPattern(scale) {
+                            events {
+                                transient {
+                                    intensity = 1f
+                                    sharpness = 1f
+                                }
+                            }
+                        }
+
+                    PrimitiveType.LowTick ->
+                        CHHapticPattern(scale) {
+                            events {
+                                transient {
+                                    intensity = .8f
+                                    sharpness = .8f
+                                }
+                            }
+                        }
                 }
 
-                PrimitiveType.Thud -> CHHapticPattern(scale) {
-                    events {
-                        transient {
-                            intensity = 1f
-                            sharpness = .6f
-                        }
-                        continuous(60.milliseconds, 20.milliseconds) {
-                            intensity = .5f
-                            sharpness = .2f
-                        }
-                    }
-                }
-
-                PrimitiveType.Spin -> CHHapticPattern(scale) {
-                    events {
-                        continuous(120.milliseconds) {
-                            sharpness = .4f
-                        }
-                    }
+            is BasicPrimitive.Custom ->
+                CHHapticPattern(scale) {
+                    events { continuous(duration) }
                     curves {
                         intensity {
-                            .2f at 0.milliseconds
-                            .8f at 40.milliseconds
-                            .7f at 80.milliseconds
-                            .0f at 120.milliseconds
-                        }
-                    }
-                }
-
-                PrimitiveType.QuickRise -> CHHapticPattern(scale) {
-                    events { continuous(50.milliseconds) }
-                    curves {
-                        intensity {
-                            .1f at 0.milliseconds
-                            1f at 50.milliseconds
+                            this@toPattern.curves.intensity.forEach { (time, value) ->
+                                add(time, value)
+                            }
                         }
                         sharpness {
-                            .2f at 0.milliseconds
-                            1f at 50.milliseconds
+                            this@toPattern.curves.sharpness.forEach { (time, value) ->
+                                add(time, value)
+                            }
                         }
                     }
                 }
-
-                PrimitiveType.SlowRise -> CHHapticPattern(scale) {
-                    events { continuous(200.milliseconds) }
-                    curves {
-                        intensity {
-                            .1f at 0.milliseconds
-                            .7f at 200.milliseconds
-                        }
-                        sharpness {
-                            .1f at 0.milliseconds
-                            .5f at 200.milliseconds
-                        }
-                    }
-                }
-
-                PrimitiveType.QuickFall -> CHHapticPattern(scale) {
-                    events { continuous(60.milliseconds) }
-                    curves {
-                        intensity {
-                            1f at 0.milliseconds
-                            .2f at 60.milliseconds
-                        }
-                        sharpness {
-                            1f at 0.milliseconds
-                            .2f at 60.milliseconds
-                        }
-                    }
-                }
-
-                PrimitiveType.Tick -> CHHapticPattern(scale) {
-                    events {
-                        transient {
-                            intensity = 1f
-                            sharpness = 1f
-                        }
-                    }
-                }
-
-                PrimitiveType.LowTick -> CHHapticPattern(scale) {
-                    events {
-                        transient {
-                            intensity = .8f
-                            sharpness = .8f
-                        }
-                    }
-                }
-            }
-
-            is BasicPrimitive.Custom -> CHHapticPattern(scale) {
-                events { continuous(duration) }
-                curves {
-                    intensity {
-                        this@toPattern.curves.intensity.forEach { (time, value) -> add(time, value) }
-                    }
-                    sharpness {
-                        this@toPattern.curves.sharpness.forEach { (time, value) -> add(time, value) }
-                    }
-                }
-            }
         }
     }
 
     @ExperimentalForeignApi
     @BetaInteropApi
-    private inline fun patternOrNull(block: (ptr: CPointer<ObjCObjectVar<NSError?>>) -> CHHapticPattern) = try {
-        runThrowing(block)
-    } catch (e: AppleError) {
-        e.printNSErrorInfo()
-        null
-    }
+    private inline fun patternOrNull(
+        block: (ptr: CPointer<ObjCObjectVar<NSError?>>) -> CHHapticPattern,
+    ) =
+        try {
+            runThrowing(block)
+        } catch (e: AppleError) {
+            e.printNSErrorInfo()
+            null
+        }
 }

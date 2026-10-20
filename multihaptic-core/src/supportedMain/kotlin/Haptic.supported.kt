@@ -1,20 +1,24 @@
 package top.ltfan.multihaptic
 
-import kotlinx.coroutines.delay
 import kotlin.time.Duration
+import kotlinx.coroutines.delay
 
 internal val HapticEffect.duration
-    get() = (primitives zip delayTimes).fold(Duration.ZERO) { acc, (primitive, delay) ->
-        acc + primitive.basic.duration + delay
-    }
+    get() =
+        (primitives zip delayTimes).fold(Duration.ZERO) { acc, (primitive, delay) ->
+            acc + primitive.basic.duration + delay
+        }
 
 internal val BasicPrimitive.duration
-    inline get() = when (this) {
-        is BasicPrimitive.Predefined -> type.duration
-        is BasicPrimitive.Custom -> duration
-    }
+    inline get() =
+        when (this) {
+            is BasicPrimitive.Predefined -> type.duration
+            is BasicPrimitive.Custom -> duration
+        }
 
-internal suspend inline fun BasicPrimitive.performByDuration(performer: suspend (Duration) -> Unit) {
+internal suspend inline fun BasicPrimitive.performByDuration(
+    performer: suspend (Duration) -> Unit,
+) {
     when (this) {
         is BasicPrimitive.Predefined -> performer(type.duration)
         is BasicPrimitive.Custom -> fallback?.let { performer(it.duration) } ?: delay(duration)
@@ -39,10 +43,12 @@ internal val HapticEffect.delayTimes: List<Duration>
             val currentDelay = primitives[i].delay
             val (_, nextDelay, nextType) = primitives[i + 1]
 
-            list += when (nextType) {
-                DelayType.Pause -> nextDelay
-                DelayType.RelativeStartOffset -> (nextDelay - currentDelay).coerceAtLeast(Duration.ZERO)
-            }
+            list +=
+                when (nextType) {
+                    DelayType.Pause -> nextDelay
+                    DelayType.RelativeStartOffset ->
+                        (nextDelay - currentDelay).coerceAtLeast(Duration.ZERO)
+                }
         }
 
         return list

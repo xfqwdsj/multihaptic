@@ -34,14 +34,15 @@ public class HapticFeedbackVibrator internal constructor(coroutineScope: Corouti
     }
 
     private val PrimitiveType.pattern
-        get() = when (this) {
-            PrimitiveType.Click -> NSHapticFeedbackPatternGeneric
-            PrimitiveType.Thud -> NSHapticFeedbackPatternLevelChange
-            PrimitiveType.Spin -> NSHapticFeedbackPatternLevelChange
-            PrimitiveType.QuickRise -> NSHapticFeedbackPatternLevelChange
-            PrimitiveType.SlowRise -> NSHapticFeedbackPatternLevelChange
-            PrimitiveType.QuickFall -> NSHapticFeedbackPatternLevelChange
-            PrimitiveType.Tick -> NSHapticFeedbackPatternAlignment
-            PrimitiveType.LowTick -> NSHapticFeedbackPatternAlignment
-        }
+        get() =
+            when (this) {
+                PrimitiveType.Click -> NSHapticFeedbackPatternGeneric
+                PrimitiveType.Thud -> NSHapticFeedbackPatternLevelChange
+                PrimitiveType.Spin -> NSHapticFeedbackPatternLevelChange
+                PrimitiveType.QuickRise -> NSHapticFeedbackPatternLevelChange
+                PrimitiveType.SlowRise -> NSHapticFeedbackPatternLevelChange
+                PrimitiveType.QuickFall -> NSHapticFeedbackPatternLevelChange
+                PrimitiveType.Tick -> NSHapticFeedbackPatternAlignment
+                PrimitiveType.LowTick -> NSHapticFeedbackPatternAlignment
+            }
 }

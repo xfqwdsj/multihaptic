@@ -10,7 +10,8 @@ import kotlinx.cinterop.ptr
 import kotlinx.cinterop.value
 import platform.Foundation.NSError
 
-public class AppleError(public val nsError: NSError) : Error("AppleException: ${nsError.localizedDescription}") {
+public class AppleError(public val nsError: NSError) :
+    Error("AppleException: ${nsError.localizedDescription}") {
     public fun printNSErrorInfo() {
         nsError.printInfo()
     }
@@ -18,12 +19,13 @@ public class AppleError(public val nsError: NSError) : Error("AppleException: ${
 
 @ExperimentalForeignApi
 @BetaInteropApi
-public inline fun <R> runThrowing(block: (ptr: CPointer<ObjCObjectVar<NSError?>>) -> R): R = memScoped {
-    val nsError: ObjCObjectVar<NSError?> = alloc()
-    val result = block(nsError.ptr)
-    nsError.value?.let { throw AppleError(it) }
-    result
-}
+public inline fun <R> runThrowing(block: (ptr: CPointer<ObjCObjectVar<NSError?>>) -> R): R =
+    memScoped {
+        val nsError: ObjCObjectVar<NSError?> = alloc()
+        val result = block(nsError.ptr)
+        nsError.value?.let { throw AppleError(it) }
+        result
+    }
 
 public fun NSError.printInfo() {
     println("NSError Domain: $domain, Code: $code")

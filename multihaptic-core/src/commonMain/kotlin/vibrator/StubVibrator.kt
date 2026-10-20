@@ -5,5 +5,6 @@ import top.ltfan.multihaptic.HapticEffect
 /** A stub implementation of [Vibrator] that does nothing. */
 public open class StubVibrator internal constructor() : Vibrator {
     override fun vibrate(effect: HapticEffect) {}
+
     override fun cancel() {}
 }

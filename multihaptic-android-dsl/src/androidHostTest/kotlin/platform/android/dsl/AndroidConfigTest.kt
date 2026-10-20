@@ -13,7 +13,10 @@ class AndroidConfigTest {
             point(0.3f, 200f) at 10.milliseconds
             point(0.5f, 300f) at 40.milliseconds
         }
-        assertEquals(listOf(10L, 10L, 20L), config.controlPoints.map { it.duration.inWholeMilliseconds })
+        assertEquals(
+            listOf(10L, 10L, 20L),
+            config.controlPoints.map { it.duration.inWholeMilliseconds },
+        )
         assertEquals(listOf(200f, 400f, 300f), config.controlPoints.map { it.data.frequencyHz })
         assertFailsWith<IllegalArgumentException> {
             waveformConfig {
@@ -68,7 +71,10 @@ class AndroidConfigTest {
             60 after 10.milliseconds
             80 at 20.milliseconds
         }
-        assertEquals(listOf(10L, 10L), amplitude.controlPoints.map { it.duration.inWholeMilliseconds })
+        assertEquals(
+            listOf(10L, 10L),
+            amplitude.controlPoints.map { it.duration.inWholeMilliseconds },
+        )
         val composed = composedConfig { click { scale = 0.5f } }
         assertEquals(0.5f, composed.primitives.single().scale)
         assertEquals(AndroidDelayType.Pause, composed.primitives.single().delayType)

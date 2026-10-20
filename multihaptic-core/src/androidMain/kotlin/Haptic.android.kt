@@ -8,8 +8,8 @@ import top.ltfan.multihaptic.vibrator.StubVibrator
 import top.ltfan.multihaptic.vibrator.Vibrator
 
 /**
- * Creates an Android vibrator from the [Context] in [config], or returns a
- * [StubVibrator] when a context or system vibrator is unavailable.
+ * Creates an Android vibrator from the [Context] in [config], or returns a [StubVibrator] when a
+ * context or system vibrator is unavailable.
  *
  * @param coroutineScope The coroutine scope to use for vibration effects.
  * @param config The Android [Context].

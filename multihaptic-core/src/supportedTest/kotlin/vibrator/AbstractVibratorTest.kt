@@ -1,30 +1,28 @@
 package top.ltfan.multihaptic.vibrator
 
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import top.ltfan.multihaptic.HapticEffect
 import top.ltfan.multihaptic.PrimitiveType
 import top.ltfan.multihaptic.predefined
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Tests for AbstractVibrator to verify that haptic effects are properly
- * processed.
+ * Tests for AbstractVibrator to verify that haptic effects are properly processed.
  *
- * Note: AbstractVibrator uses Channel.CONFLATED which keeps only the
- * latest effect and discards older pending effects. This ensures that when
- * effects are emitted faster than they can be processed, the vibrator
- * always performs the most recent effect.
+ * Note: AbstractVibrator uses Channel.CONFLATED which keeps only the latest effect and discards
+ * older pending effects. This ensures that when effects are emitted faster than they can be
+ * processed, the vibrator always performs the most recent effect.
  */
 class AbstractVibratorTest {
 
     /**
-     * A test implementation of AbstractVibrator that records all performed
-     * effects and simulates playback duration using delays.
+     * A test implementation of AbstractVibrator that records all performed effects and simulates
+     * playback duration using delays.
      */
     private class TestVibrator(coroutineScope: CoroutineScope) : AbstractVibrator(coroutineScope) {
         val performedEffects = mutableListOf<HapticEffect>()
@@ -32,12 +30,15 @@ class AbstractVibratorTest {
         override suspend fun perform(effect: HapticEffect) {
             performedEffects.add(effect)
             // Simulate playback duration based on effect duration
-            val duration = effect.primitives.sumOf { primitive ->
-                when (val basic = primitive.basic) {
-                    is top.ltfan.multihaptic.BasicPrimitive.Predefined -> basic.type.duration.inWholeMilliseconds
-                    is top.ltfan.multihaptic.BasicPrimitive.Custom -> basic.duration.inWholeMilliseconds
+            val duration =
+                effect.primitives.sumOf { primitive ->
+                    when (val basic = primitive.basic) {
+                        is top.ltfan.multihaptic.BasicPrimitive.Predefined ->
+                            basic.type.duration.inWholeMilliseconds
+                        is top.ltfan.multihaptic.BasicPrimitive.Custom ->
+                            basic.duration.inWholeMilliseconds
+                    }
                 }
-            }
             delay(duration.milliseconds)
         }
 
@@ -48,7 +49,6 @@ class AbstractVibratorTest {
 
     @Test
     fun testMultipleIdenticalEffectsAreProcessed() = runTest {
-
         val vibrator = TestVibrator(this)
 
         // Create the same haptic effect multiple times
@@ -68,7 +68,11 @@ class AbstractVibratorTest {
 
         // With Channel.CONFLATED and proper delays, each effect should be processed
         // since we wait for the previous one to complete before sending the next
-        assertEquals(5, vibrator.performedEffects.size, "Expected 5 effects to be performed when sent with delays")
+        assertEquals(
+            5,
+            vibrator.performedEffects.size,
+            "Expected 5 effects to be performed when sent with delays",
+        )
 
         // Verify all effects are equal (same content)
         vibrator.performedEffects.forEach { performedEffect ->
@@ -78,7 +82,6 @@ class AbstractVibratorTest {
 
     @Test
     fun testConflationDiscardsOldEffects() = runTest {
-
         val vibrator = TestVibrator(this)
 
         val effect1 = HapticEffect {
@@ -126,7 +129,6 @@ class AbstractVibratorTest {
 
     @Test
     fun testRapidSuccessiveIdenticalEffects() = runTest {
-
         val vibrator = TestVibrator(this)
 
         val effect = HapticEffect {
@@ -160,7 +162,6 @@ class AbstractVibratorTest {
 
     @Test
     fun testDifferentEffectsAreProcessed() = runTest {
-
         val vibrator = TestVibrator(this)
 
         val clickEffect = HapticEffect {
@@ -198,7 +199,6 @@ class AbstractVibratorTest {
 
     @Test
     fun testMixedIdenticalAndDifferentEffects() = runTest {
-
         val vibrator = TestVibrator(this)
 
         val effect1 = HapticEffect {
@@ -238,7 +238,6 @@ class AbstractVibratorTest {
 
     @Test
     fun testSingleEffectIsProcessed() = runTest {
-
         val vibrator = TestVibrator(this)
 
         val effect = HapticEffect {
@@ -257,7 +256,6 @@ class AbstractVibratorTest {
 
     @Test
     fun testEffectsWithSameTypeButDifferentParameters() = runTest {
-
         val vibrator = TestVibrator(this)
 
         val effect1 = HapticEffect {
@@ -292,7 +290,6 @@ class AbstractVibratorTest {
 
     @Test
     fun testHighFrequencyIdenticalEffects() = runTest {
-
         val vibrator = TestVibrator(this)
 
         val effect = HapticEffect {
@@ -311,13 +308,15 @@ class AbstractVibratorTest {
 
         // Due to conflation, we expect much fewer than 20 to be processed
         assertTrue(vibrator.performedEffects.isNotEmpty(), "At least 1 effect should be processed")
-        assertTrue(vibrator.performedEffects.size < 20, "Due to conflation, fewer than all 20 should be processed")
+        assertTrue(
+            vibrator.performedEffects.size < 20,
+            "Due to conflation, fewer than all 20 should be processed",
+        )
         println("Processed ${vibrator.performedEffects.size} effects out of 20 sent rapidly")
     }
 
     @Test
     fun testRandomDelayOfIdenticalEffects() = runTest {
-
         val vibrator = TestVibrator(this)
 
         val effect = HapticEffect {
@@ -340,12 +339,13 @@ class AbstractVibratorTest {
         // With random short delays, some effects may be processed
         assertTrue(vibrator.performedEffects.isNotEmpty(), "At least 1 effect should be processed")
         assertTrue(vibrator.performedEffects.size <= 5, "At most 5 effects can be processed")
-        println("Processed ${vibrator.performedEffects.size} effects out of 5 sent with random delays")
+        println(
+            "Processed ${vibrator.performedEffects.size} effects out of 5 sent with random delays",
+        )
     }
 
     @Test
     fun testEffectWithMultiplePrimitives() = runTest {
-
         val vibrator = TestVibrator(this)
 
         val effect = HapticEffect {
@@ -371,7 +371,11 @@ class AbstractVibratorTest {
     fun testIsVibrationSupportedDefaultFalse() {
         // StubVibrator should return false for isVibrationSupported
         val stubVibrator = StubVibrator()
-        assertEquals(false, stubVibrator.isVibrationSupported, "StubVibrator should not support vibration")
+        assertEquals(
+            false,
+            stubVibrator.isVibrationSupported,
+            "StubVibrator should not support vibration",
+        )
     }
 
     @Test

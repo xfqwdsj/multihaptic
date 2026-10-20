@@ -1,11 +1,11 @@
 package top.ltfan.multihaptic.platform.android
 
-import top.ltfan.multihaptic.platform.android.dsl.add
-import top.ltfan.multihaptic.platform.android.dsl.amplitudeConfig
-import top.ltfan.multihaptic.platform.android.dsl.waveformConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.milliseconds
+import top.ltfan.multihaptic.platform.android.dsl.add
+import top.ltfan.multihaptic.platform.android.dsl.amplitudeConfig
+import top.ltfan.multihaptic.platform.android.dsl.waveformConfig
 
 class AndroidScalingTest {
     @Test

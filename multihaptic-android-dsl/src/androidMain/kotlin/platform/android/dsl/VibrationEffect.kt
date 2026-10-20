@@ -6,45 +6,52 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
+import kotlin.math.roundToInt
+import kotlin.time.Duration
 import top.ltfan.dslutilities.DslBuildHook
 import top.ltfan.dslutilities.DslBuilder
 import top.ltfan.dslutilities.DslInitialProvider
 import top.ltfan.dslutilities.DslList
 import top.ltfan.dslutilities.DslListHook
 import top.ltfan.dslutilities.DslValue
-import kotlin.math.roundToInt
-import kotlin.time.Duration
 
 public data class WaveformControlPoint(val data: WaveformPoint, val duration: Duration)
+
 public data class WaveformPoint(val amplitude: Float, val frequencyHz: Float)
+
 public data class EnvelopeControlPoint(val data: EnvelopePoint, val duration: Duration)
+
 public data class EnvelopePoint(val intensity: Float, val sharpness: Float)
+
 public data class AmplitudeControlPoint(val amplitude: Int, val duration: Duration)
+
 public data class OnOffInterval(val start: Duration, val end: Duration)
 
 @RequiresApi(Build.VERSION_CODES.R)
 public enum class AndroidPrimitiveType(public val id: Int) {
     Click(VibrationEffect.Composition.PRIMITIVE_CLICK),
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    Thud(VibrationEffect.Composition.PRIMITIVE_THUD),
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    Spin(VibrationEffect.Composition.PRIMITIVE_SPIN), QuickRise(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE), SlowRise(
+    @RequiresApi(Build.VERSION_CODES.S) Thud(VibrationEffect.Composition.PRIMITIVE_THUD),
+    @RequiresApi(Build.VERSION_CODES.S) Spin(VibrationEffect.Composition.PRIMITIVE_SPIN),
+    QuickRise(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE),
+    SlowRise(
         VibrationEffect.Composition.PRIMITIVE_SLOW_RISE,
     ),
-    QuickFall(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL), Tick(VibrationEffect.Composition.PRIMITIVE_TICK),
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    LowTick(VibrationEffect.Composition.PRIMITIVE_LOW_TICK),
+    QuickFall(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL),
+    Tick(VibrationEffect.Composition.PRIMITIVE_TICK),
+    @RequiresApi(Build.VERSION_CODES.S) LowTick(VibrationEffect.Composition.PRIMITIVE_LOW_TICK),
 }
 
 @RequiresApi(Build.VERSION_CODES.BAKLAVA)
 public enum class AndroidDelayType(public val id: Int) {
-    Pause(VibrationEffect.Composition.DELAY_TYPE_PAUSE), RelativeStartOffset(VibrationEffect.Composition.DELAY_TYPE_RELATIVE_START_OFFSET),
+    Pause(VibrationEffect.Composition.DELAY_TYPE_PAUSE),
+    RelativeStartOffset(VibrationEffect.Composition.DELAY_TYPE_RELATIVE_START_OFFSET),
 }
 
-@DslBuilder(resultName = "WaveformConfig", generateFunction = false, buildHook = ValidateWaveform::class)
+@DslBuilder(
+    resultName = "WaveformConfig",
+    generateFunction = false,
+    buildHook = ValidateWaveform::class,
+)
 public interface WaveformDsl {
     public val initialFrequencyHz: Float?
 
@@ -52,7 +59,11 @@ public interface WaveformDsl {
     public var controlPoints: MutableList<WaveformControlPoint>
 }
 
-@DslBuilder(resultName = "EnvelopeConfig", generateFunction = false, buildHook = ValidateEnvelope::class)
+@DslBuilder(
+    resultName = "EnvelopeConfig",
+    generateFunction = false,
+    buildHook = ValidateEnvelope::class,
+)
 public interface EnvelopeDsl {
     public val initialSharpness: Float?
 
@@ -64,23 +75,28 @@ public interface EnvelopeDsl {
 public interface ComposedPrimitiveDsl {
     public val type: AndroidPrimitiveType
 
-    @DslValue(initial = "1")
-    public var scale: Float
+    @DslValue(initial = "1") public var scale: Float
 
-    @DslValue(provider = ZeroDuration::class)
-    public var delay: Duration
+    @DslValue(provider = ZeroDuration::class) public var delay: Duration
 
-    @DslValue(provider = PauseDelay::class)
-    public var delayType: AndroidDelayType
+    @DslValue(provider = PauseDelay::class) public var delayType: AndroidDelayType
 }
 
-@DslBuilder(resultName = "ComposedConfig", generateFunction = false, buildHook = ValidateComposed::class)
+@DslBuilder(
+    resultName = "ComposedConfig",
+    generateFunction = false,
+    buildHook = ValidateComposed::class,
+)
 public interface ComposedDsl {
     @DslList(hook = ComposedPrimitiveHook::class)
     public var primitives: MutableList<ComposedPrimitive>
 }
 
-@DslBuilder(resultName = "AmplitudeConfig", generateFunction = false, buildHook = ValidateAmplitude::class)
+@DslBuilder(
+    resultName = "AmplitudeConfig",
+    generateFunction = false,
+    buildHook = ValidateAmplitude::class,
+)
 public interface AmplitudeDsl {
     public val repeat: Int
 
@@ -92,8 +108,7 @@ public interface AmplitudeDsl {
 public interface OnOffDsl {
     public val repeat: Int
 
-    @DslList(hook = OnOffIntervalHook::class)
-    public var intervals: MutableList<OnOffInterval>
+    @DslList(hook = OnOffIntervalHook::class) public var intervals: MutableList<OnOffInterval>
 }
 
 public object ZeroDuration : DslInitialProvider<Duration> {
@@ -145,14 +160,18 @@ public object OnOffIntervalHook : DslListHook<OnOffInterval> {
 
 public object ValidateWaveform : DslBuildHook<WaveformDsl> {
     override fun beforeBuild(scope: WaveformDsl) {
-        check(scope.controlPoints.isNotEmpty()) { "Waveform effects must have at least one control point." }
+        check(scope.controlPoints.isNotEmpty()) {
+            "Waveform effects must have at least one control point."
+        }
         require(scope.initialFrequencyHz == null || scope.initialFrequencyHz!! >= 0f)
     }
 }
 
 public object ValidateEnvelope : DslBuildHook<EnvelopeDsl> {
     override fun beforeBuild(scope: EnvelopeDsl) {
-        check(scope.controlPoints.isNotEmpty()) { "Basic envelope effects must have at least one control point." }
+        check(scope.controlPoints.isNotEmpty()) {
+            "Basic envelope effects must have at least one control point."
+        }
         check(scope.controlPoints.last().data.intensity == 0f) {
             "Basic envelope effects must end at a zero intensity control point."
         }
@@ -162,7 +181,9 @@ public object ValidateEnvelope : DslBuildHook<EnvelopeDsl> {
 
 public object ValidateComposed : DslBuildHook<ComposedDsl> {
     override fun beforeBuild(scope: ComposedDsl) {
-        check(scope.primitives.isNotEmpty()) { "Composed effects must have at least one primitive." }
+        check(scope.primitives.isNotEmpty()) {
+            "Composed effects must have at least one primitive."
+        }
     }
 }
 
@@ -191,18 +212,24 @@ private fun normalizeIntervals(intervals: List<OnOffInterval>): MutableList<OnOf
     return merged
 }
 
-public inline fun waveformConfig(initialFrequencyHz: Float? = null, block: WaveformDsl.() -> Unit): WaveformConfig =
-    WaveformDslBuilder(initialFrequencyHz).apply(block).build()
+public inline fun waveformConfig(
+    initialFrequencyHz: Float? = null,
+    block: WaveformDsl.() -> Unit,
+): WaveformConfig = WaveformDslBuilder(initialFrequencyHz).apply(block).build()
 
-public inline fun envelopeConfig(initialSharpness: Float? = null, block: EnvelopeDsl.() -> Unit): EnvelopeConfig =
-    EnvelopeDslBuilder(initialSharpness).apply(block).build()
+public inline fun envelopeConfig(
+    initialSharpness: Float? = null,
+    block: EnvelopeDsl.() -> Unit,
+): EnvelopeConfig = EnvelopeDslBuilder(initialSharpness).apply(block).build()
 
 @RequiresApi(Build.VERSION_CODES.R)
 public inline fun composedConfig(block: ComposedDsl.() -> Unit): ComposedConfig =
     ComposedDslBuilder().apply(block).build()
 
-public inline fun amplitudeConfig(repeat: Int = -1, block: AmplitudeDsl.() -> Unit): AmplitudeConfig =
-    AmplitudeDslBuilder(repeat).apply(block).build()
+public inline fun amplitudeConfig(
+    repeat: Int = -1,
+    block: AmplitudeDsl.() -> Unit,
+): AmplitudeConfig = AmplitudeDslBuilder(repeat).apply(block).build()
 
 public inline fun onOffConfig(repeat: Int = -1, block: OnOffDsl.() -> Unit): OnOffConfig =
     OnOffDslBuilder(repeat).apply(block).build()
@@ -230,7 +257,8 @@ private inline fun <D, C> MutableList<C>.insertAt(
     add(create(data, time - elapsed))
 }
 
-public val WaveformDsl.list: MutableList<WaveformControlPoint> inline get() = controlPoints
+public val WaveformDsl.list: MutableList<WaveformControlPoint>
+    inline get() = controlPoints
 
 @Suppress("UnusedReceiverParameter")
 public fun WaveformDsl.point(amplitude: Float, frequencyHz: Float): WaveformPoint =
@@ -259,10 +287,13 @@ public infix fun WaveformPoint.at(time: Duration) {
     )
 }
 
-public val EnvelopeDsl.list: MutableList<EnvelopeControlPoint> inline get() = controlPoints
+public val EnvelopeDsl.list: MutableList<EnvelopeControlPoint>
+    inline get() = controlPoints
 
 @Suppress("UnusedReceiverParameter")
-public fun EnvelopeDsl.point(intensity: Float, sharpness: Float): EnvelopePoint = EnvelopePoint(intensity, sharpness)
+public fun EnvelopeDsl.point(intensity: Float, sharpness: Float): EnvelopePoint =
+    EnvelopePoint(intensity, sharpness)
+
 public fun EnvelopeDsl.add(point: EnvelopeControlPoint) {
     controlPoints += point
 }
@@ -286,7 +317,9 @@ public infix fun EnvelopePoint.at(time: Duration) {
     )
 }
 
-public val AmplitudeDsl.list: MutableList<AmplitudeControlPoint> inline get() = controlPoints
+public val AmplitudeDsl.list: MutableList<AmplitudeControlPoint>
+    inline get() = controlPoints
+
 public fun AmplitudeDsl.add(amplitude: Int, duration: Duration) {
     controlPoints += AmplitudeControlPoint(amplitude, duration)
 }
@@ -317,7 +350,9 @@ public infix fun Float.at(time: Duration) {
     (this * 255).roundToInt().coerceIn(0..255) at time
 }
 
-public val OnOffDsl.list: MutableList<OnOffInterval> inline get() = intervals
+public val OnOffDsl.list: MutableList<OnOffInterval>
+    inline get() = intervals
+
 public fun OnOffDsl.range(start: Duration, end: Duration) {
     require(start >= Duration.ZERO) { "Effect start time must be non-negative." }
     require(end >= Duration.ZERO) { "Effect end time must be non-negative." }
@@ -328,7 +363,9 @@ public fun OnOffDsl.range(start: Duration, end: Duration) {
     intervals.addAll(merged)
 }
 
-public fun OnOffDsl.range(range: ClosedRange<Duration>): Unit = range(range.start, range.endInclusive)
+public fun OnOffDsl.range(range: ClosedRange<Duration>): Unit =
+    range(range.start, range.endInclusive)
+
 public fun OnOffDsl.pattern(off: Duration, on: Duration) {
     require(off >= Duration.ZERO) { "Off duration must be non-negative." }
     require(on >= Duration.ZERO) { "On duration must be non-negative." }
@@ -337,61 +374,72 @@ public fun OnOffDsl.pattern(off: Duration, on: Duration) {
 }
 
 @RequiresApi(Build.VERSION_CODES.R)
-public inline fun ComposedDsl.primitive(type: AndroidPrimitiveType, block: ComposedPrimitiveDsl.() -> Unit = {}) {
+public inline fun ComposedDsl.primitive(
+    type: AndroidPrimitiveType,
+    block: ComposedPrimitiveDsl.() -> Unit = {},
+) {
     primitives += ComposedPrimitiveDslBuilder(type).apply(block).build()
 }
 
 @get:RequiresApi(Build.VERSION_CODES.R)
-public val ComposedDsl.click: Unit inline get() = click()
+public val ComposedDsl.click: Unit
+    inline get() = click()
 
 @RequiresApi(Build.VERSION_CODES.R)
 public inline fun ComposedDsl.click(block: ComposedPrimitiveDsl.() -> Unit = {}): Unit =
     primitive(AndroidPrimitiveType.Click, block)
 
 @get:RequiresApi(Build.VERSION_CODES.S)
-public val ComposedDsl.thud: Unit inline get() = thud()
+public val ComposedDsl.thud: Unit
+    inline get() = thud()
 
 @RequiresApi(Build.VERSION_CODES.S)
 public inline fun ComposedDsl.thud(block: ComposedPrimitiveDsl.() -> Unit = {}): Unit =
     primitive(AndroidPrimitiveType.Thud, block)
 
 @get:RequiresApi(Build.VERSION_CODES.S)
-public val ComposedDsl.spin: Unit inline get() = spin()
+public val ComposedDsl.spin: Unit
+    inline get() = spin()
 
 @RequiresApi(Build.VERSION_CODES.S)
 public inline fun ComposedDsl.spin(block: ComposedPrimitiveDsl.() -> Unit = {}): Unit =
     primitive(AndroidPrimitiveType.Spin, block)
 
 @get:RequiresApi(Build.VERSION_CODES.R)
-public val ComposedDsl.quickRise: Unit inline get() = quickRise()
+public val ComposedDsl.quickRise: Unit
+    inline get() = quickRise()
 
 @RequiresApi(Build.VERSION_CODES.R)
 public inline fun ComposedDsl.quickRise(block: ComposedPrimitiveDsl.() -> Unit = {}): Unit =
     primitive(AndroidPrimitiveType.QuickRise, block)
 
 @get:RequiresApi(Build.VERSION_CODES.R)
-public val ComposedDsl.slowRise: Unit inline get() = slowRise()
+public val ComposedDsl.slowRise: Unit
+    inline get() = slowRise()
 
 @RequiresApi(Build.VERSION_CODES.R)
 public inline fun ComposedDsl.slowRise(block: ComposedPrimitiveDsl.() -> Unit = {}): Unit =
     primitive(AndroidPrimitiveType.SlowRise, block)
 
 @get:RequiresApi(Build.VERSION_CODES.R)
-public val ComposedDsl.quickFall: Unit inline get() = quickFall()
+public val ComposedDsl.quickFall: Unit
+    inline get() = quickFall()
 
 @RequiresApi(Build.VERSION_CODES.R)
 public inline fun ComposedDsl.quickFall(block: ComposedPrimitiveDsl.() -> Unit = {}): Unit =
     primitive(AndroidPrimitiveType.QuickFall, block)
 
 @get:RequiresApi(Build.VERSION_CODES.R)
-public val ComposedDsl.tick: Unit inline get() = tick()
+public val ComposedDsl.tick: Unit
+    inline get() = tick()
 
 @RequiresApi(Build.VERSION_CODES.R)
 public inline fun ComposedDsl.tick(block: ComposedPrimitiveDsl.() -> Unit = {}): Unit =
     primitive(AndroidPrimitiveType.Tick, block)
 
 @get:RequiresApi(Build.VERSION_CODES.S)
-public val ComposedDsl.lowTick: Unit inline get() = lowTick()
+public val ComposedDsl.lowTick: Unit
+    inline get() = lowTick()
 
 @RequiresApi(Build.VERSION_CODES.S)
 public inline fun ComposedDsl.lowTick(block: ComposedPrimitiveDsl.() -> Unit = {}): Unit =
@@ -410,39 +458,65 @@ public val ComposedPrimitiveDsl.relativeStartOffsetDelay: Unit
     }
 
 @RequiresApi(Build.VERSION_CODES.BAKLAVA)
-public fun WaveformConfig.toNative(): VibrationEffect = VibrationEffect.WaveformEnvelopeBuilder().apply {
-    initialFrequencyHz?.let(::setInitialFrequencyHz)
-    controlPoints.forEach { addControlPoint(it.data.amplitude, it.data.frequencyHz, it.duration.inWholeMilliseconds) }
-}.build()
+public fun WaveformConfig.toNative(): VibrationEffect =
+    VibrationEffect.WaveformEnvelopeBuilder()
+        .apply {
+            initialFrequencyHz?.let(::setInitialFrequencyHz)
+            controlPoints.forEach {
+                addControlPoint(
+                    it.data.amplitude,
+                    it.data.frequencyHz,
+                    it.duration.inWholeMilliseconds,
+                )
+            }
+        }
+        .build()
 
 @RequiresApi(Build.VERSION_CODES.BAKLAVA)
-public fun EnvelopeConfig.toNative(): VibrationEffect = VibrationEffect.BasicEnvelopeBuilder().apply {
-    initialSharpness?.let(::setInitialSharpness)
-    controlPoints.forEach { addControlPoint(it.data.intensity, it.data.sharpness, it.duration.inWholeMilliseconds) }
-}.build()
+public fun EnvelopeConfig.toNative(): VibrationEffect =
+    VibrationEffect.BasicEnvelopeBuilder()
+        .apply {
+            initialSharpness?.let(::setInitialSharpness)
+            controlPoints.forEach {
+                addControlPoint(
+                    it.data.intensity,
+                    it.data.sharpness,
+                    it.duration.inWholeMilliseconds,
+                )
+            }
+        }
+        .build()
 
 @RequiresApi(Build.VERSION_CODES.R)
-public fun ComposedConfig.toNative(): VibrationEffect = VibrationEffect.startComposition().apply {
-    primitives.forEach { primitive ->
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
-            addPrimitive(
-                primitive.type.id,
-                primitive.scale,
-                primitive.delay.inWholeMilliseconds.toInt(),
-                primitive.delayType.id,
-            )
-        } else {
-            addPrimitive(primitive.type.id, primitive.scale, primitive.delay.inWholeMilliseconds.toInt())
+public fun ComposedConfig.toNative(): VibrationEffect =
+    VibrationEffect.startComposition()
+        .apply {
+            primitives.forEach { primitive ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
+                    addPrimitive(
+                        primitive.type.id,
+                        primitive.scale,
+                        primitive.delay.inWholeMilliseconds.toInt(),
+                        primitive.delayType.id,
+                    )
+                } else {
+                    addPrimitive(
+                        primitive.type.id,
+                        primitive.scale,
+                        primitive.delay.inWholeMilliseconds.toInt(),
+                    )
+                }
+            }
         }
-    }
-}.compose()
+        .compose()
 
 @RequiresApi(Build.VERSION_CODES.O)
-public fun AmplitudeConfig.toNative(): VibrationEffect = VibrationEffect.createWaveform(
-    controlPoints.map { it.duration.inWholeMilliseconds }.toLongArray(),
-    controlPoints.map { it.amplitude }.toIntArray(),
-    repeat,
-)
+public fun AmplitudeConfig.toNative(): VibrationEffect =
+    VibrationEffect.createWaveform(
+        controlPoints.map { it.duration.inWholeMilliseconds }.toLongArray(),
+        controlPoints.map { it.amplitude }.toIntArray(),
+        repeat,
+    )
 
 @RequiresApi(Build.VERSION_CODES.O)
 public fun OnOffConfig.toNative(): VibrationEffect {
@@ -473,14 +547,26 @@ public inline fun composedVibrationEffect(block: ComposedDsl.() -> Unit): Vibrat
     composedConfig(block).toNative()
 
 @RequiresApi(Build.VERSION_CODES.O)
-public inline fun amplitudeVibrationEffect(repeat: Int = -1, block: AmplitudeDsl.() -> Unit): VibrationEffect =
-    amplitudeConfig(repeat, block).toNative()
+public inline fun amplitudeVibrationEffect(
+    repeat: Int = -1,
+    block: AmplitudeDsl.() -> Unit,
+): VibrationEffect = amplitudeConfig(repeat, block).toNative()
 
 @RequiresApi(Build.VERSION_CODES.O)
-public inline fun onOffVibrationEffect(repeat: Int = -1, block: OnOffDsl.() -> Unit): VibrationEffect =
-    onOffConfig(repeat, block).toNative()
+public inline fun onOffVibrationEffect(
+    repeat: Int = -1,
+    block: OnOffDsl.() -> Unit,
+): VibrationEffect = onOffConfig(repeat, block).toNative()
 
-public inline fun <R> Context.withVibratorOrNull(block: Vibrator?.() -> R): R = getSystemService<Vibrator>().block()
+public inline fun <R> Context.withVibratorOrNull(block: Vibrator?.() -> R): R =
+    getSystemService<Vibrator>().block()
 
-public inline fun <R> Context.tryWithVibrator(failed: () -> Unit = {}, block: Vibrator.() -> R): R? =
-    getSystemService<Vibrator>()?.block() ?: run { failed(); null }
+public inline fun <R> Context.tryWithVibrator(
+    failed: () -> Unit = {},
+    block: Vibrator.() -> R,
+): R? =
+    getSystemService<Vibrator>()?.block()
+        ?: run {
+            failed()
+            null
+        }

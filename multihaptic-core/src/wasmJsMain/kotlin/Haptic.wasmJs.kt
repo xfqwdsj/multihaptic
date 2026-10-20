@@ -1,7 +1,7 @@
 package top.ltfan.multihaptic
 
-import kotlinx.browser.window
 import kotlin.time.Duration
+import kotlinx.browser.window
 
 internal actual fun vibrate(duration: Duration) {
     if (isVibrationSupported()) {

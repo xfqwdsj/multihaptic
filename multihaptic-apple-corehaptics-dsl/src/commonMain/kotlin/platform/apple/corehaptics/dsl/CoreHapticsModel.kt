@@ -1,5 +1,8 @@
 package top.ltfan.multihaptic.platform.apple.corehaptics.dsl
 
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import top.ltfan.dslutilities.DslBuildHook
 import top.ltfan.dslutilities.DslBuilder
 import top.ltfan.dslutilities.DslInitialProvider
@@ -7,9 +10,6 @@ import top.ltfan.dslutilities.DslList
 import top.ltfan.dslutilities.DslListHook
 import top.ltfan.dslutilities.DslListScope
 import top.ltfan.dslutilities.DslValue
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 public val DefaultDuration: Duration = 50.milliseconds
 
@@ -21,32 +21,24 @@ public sealed interface HapticEvent {
 
 @DslBuilder(resultName = "TransientEvent", supertype = HapticEvent::class)
 public interface TransientEventDsl {
-    @DslValue
-    public var hapticIntensity: Float?
+    @DslValue public var hapticIntensity: Float?
 
-    @DslValue
-    public var hapticSharpness: Float?
+    @DslValue public var hapticSharpness: Float?
 
-    @DslValue(provider = ZeroDuration::class)
-    public var relativeTime: Duration
+    @DslValue(provider = ZeroDuration::class) public var relativeTime: Duration
 }
 
 @DslBuilder(resultName = "ContinuousEvent", supertype = HapticEvent::class)
 public interface ContinuousEventDsl : TransientEventDsl {
-    @DslValue(provider = DefaultEventDuration::class)
-    public var duration: Duration
+    @DslValue(provider = DefaultEventDuration::class) public var duration: Duration
 
-    @DslValue
-    public var attackTime: Duration?
+    @DslValue public var attackTime: Duration?
 
-    @DslValue
-    public var decayTime: Duration?
+    @DslValue public var decayTime: Duration?
 
-    @DslValue(provider = ZeroDuration::class)
-    public var releaseTime: Duration
+    @DslValue(provider = ZeroDuration::class) public var releaseTime: Duration
 
-    @DslValue(initial = "false")
-    public var sustained: Boolean
+    @DslValue(initial = "false") public var sustained: Boolean
 }
 
 public object ZeroDuration : DslInitialProvider<Duration> {
@@ -57,31 +49,44 @@ public object DefaultEventDuration : DslInitialProvider<Duration> {
     override fun provide(): Duration = DefaultDuration
 }
 
-public enum class CurveKind { Intensity, Sharpness, AttackTime, DecayTime, ReleaseTime }
+public enum class CurveKind {
+    Intensity,
+    Sharpness,
+    AttackTime,
+    DecayTime,
+    ReleaseTime,
+}
 
 @DslBuilder(resultName = "CurveControlPoint", requireConfiguration = true)
 public interface CurveControlPointDsl {
-    @DslValue(required = true)
-    public var relativeTime: Duration
+    @DslValue(required = true) public var relativeTime: Duration
 
-    @DslValue(required = true)
-    public var value: Float
+    @DslValue(required = true) public var value: Float
 }
 
-@DslBuilder(resultName = "HapticParameterCurve", buildHook = ValidateCurve::class, requireConfiguration = true)
+@DslBuilder(
+    resultName = "HapticParameterCurve",
+    buildHook = ValidateCurve::class,
+    requireConfiguration = true,
+)
 public interface HapticParameterCurveDsl {
     public val kind: CurveKind
 
-    @DslValue(provider = ZeroDuration::class)
-    public var relativeTime: Duration
+    @DslValue(provider = ZeroDuration::class) public var relativeTime: Duration
 
-    @DslList(scopeName = "points", hook = CurvePointHook::class, children = [CurveControlPointDsl::class])
+    @DslList(
+        scopeName = "points",
+        hook = CurvePointHook::class,
+        children = [CurveControlPointDsl::class],
+    )
     public var controlPoints: MutableList<CurveControlPoint>
 }
 
 public object CurvePointHook : DslListHook<CurveControlPoint> {
     override fun beforeSet(element: CurveControlPoint) {
-        require(element.relativeTime >= Duration.ZERO) { "Control point time must be non-negative." }
+        require(element.relativeTime >= Duration.ZERO) {
+            "Control point time must be non-negative."
+        }
     }
 }
 

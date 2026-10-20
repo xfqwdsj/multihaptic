@@ -4,6 +4,7 @@ package samples.dsl
 
 import android.annotation.SuppressLint
 import android.content.Context
+import kotlin.time.Duration.Companion.milliseconds
 import top.ltfan.multihaptic.platform.android.dsl.after
 import top.ltfan.multihaptic.platform.android.dsl.amplitudeVibrationEffect
 import top.ltfan.multihaptic.platform.android.dsl.at
@@ -25,7 +26,6 @@ import top.ltfan.multihaptic.platform.android.dsl.tick
 import top.ltfan.multihaptic.platform.android.dsl.tryWithVibrator
 import top.ltfan.multihaptic.platform.android.dsl.waveformVibrationEffect
 import top.ltfan.multihaptic.platform.android.dsl.withVibratorOrNull
-import kotlin.time.Duration.Companion.milliseconds
 
 @SuppressLint("NewApi")
 fun onOff() {

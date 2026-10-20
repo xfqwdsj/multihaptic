@@ -2,12 +2,12 @@ package top.ltfan.multihaptic.platform.android.dsl
 
 import android.os.VibrationEffect
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.runner.RunWith
 import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.time.Duration.Companion.milliseconds
+import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class VibrationEffectTest {
@@ -18,23 +18,30 @@ class VibrationEffectTest {
             point(.9f, 500f) at 20.milliseconds
         }
 
-        val androidApi1 = VibrationEffect.WaveformEnvelopeBuilder().apply {
-            addControlPoint(.5f, 300f, 10)
-            addControlPoint(.9f, 500f, 10)
-        }.build()
+        val androidApi1 =
+            VibrationEffect.WaveformEnvelopeBuilder()
+                .apply {
+                    addControlPoint(.5f, 300f, 10)
+                    addControlPoint(.9f, 500f, 10)
+                }
+                .build()
 
         assertEquals(androidApi1, dslCreated1)
 
-        val dslCreated2 = waveformVibrationEffect(200f) {
-            point(.5f, 300f) after 10.milliseconds
-            point(.9f, 500f) after 10.milliseconds
-        }
+        val dslCreated2 =
+            waveformVibrationEffect(200f) {
+                point(.5f, 300f) after 10.milliseconds
+                point(.9f, 500f) after 10.milliseconds
+            }
 
-        val androidApi2 = VibrationEffect.WaveformEnvelopeBuilder().apply {
-            setInitialFrequencyHz(200f)
-            addControlPoint(.5f, 300f, 10)
-            addControlPoint(.9f, 500f, 10)
-        }.build()
+        val androidApi2 =
+            VibrationEffect.WaveformEnvelopeBuilder()
+                .apply {
+                    setInitialFrequencyHz(200f)
+                    addControlPoint(.5f, 300f, 10)
+                    addControlPoint(.9f, 500f, 10)
+                }
+                .build()
 
         assertEquals(androidApi2, dslCreated2)
     }
@@ -60,23 +67,30 @@ class VibrationEffectTest {
             point(0f, 1f) at 20.milliseconds
         }
 
-        val androidApi1 = VibrationEffect.BasicEnvelopeBuilder().apply {
-            addControlPoint(.5f, 1f, 10)
-            addControlPoint(0f, 1f, 10)
-        }.build()
+        val androidApi1 =
+            VibrationEffect.BasicEnvelopeBuilder()
+                .apply {
+                    addControlPoint(.5f, 1f, 10)
+                    addControlPoint(0f, 1f, 10)
+                }
+                .build()
 
         assertEquals(androidApi1, dslCreated1)
 
-        val dslCreated2 = envelopeVibrationEffect(.5f) {
-            point(.5f, 1f) after 10.milliseconds
-            point(0f, 1f) after 20.milliseconds
-        }
+        val dslCreated2 =
+            envelopeVibrationEffect(.5f) {
+                point(.5f, 1f) after 10.milliseconds
+                point(0f, 1f) after 20.milliseconds
+            }
 
-        val androidApi2 = VibrationEffect.BasicEnvelopeBuilder().apply {
-            setInitialSharpness(.5f)
-            addControlPoint(.5f, 1f, 10)
-            addControlPoint(0f, 1f, 20)
-        }.build()
+        val androidApi2 =
+            VibrationEffect.BasicEnvelopeBuilder()
+                .apply {
+                    setInitialSharpness(.5f)
+                    addControlPoint(.5f, 1f, 10)
+                    addControlPoint(0f, 1f, 20)
+                }
+                .build()
 
         assertEquals(androidApi2, dslCreated2)
     }
@@ -116,14 +130,17 @@ class VibrationEffectTest {
             point(.5f, 300f) at 70.milliseconds
         }
 
-        val androidApi = VibrationEffect.WaveformEnvelopeBuilder().apply {
-            addControlPoint(.5f, 300f, 10)
-            addControlPoint(.5f, 500f, 10)
-            addControlPoint(.5f, 300f, 10)
-            addControlPoint(.5f, 300f, 10)
-            addControlPoint(.5f, 300f, 30)
-            addControlPoint(.5f, 300f, 10)
-        }.build()
+        val androidApi =
+            VibrationEffect.WaveformEnvelopeBuilder()
+                .apply {
+                    addControlPoint(.5f, 300f, 10)
+                    addControlPoint(.5f, 500f, 10)
+                    addControlPoint(.5f, 300f, 10)
+                    addControlPoint(.5f, 300f, 10)
+                    addControlPoint(.5f, 300f, 30)
+                    addControlPoint(.5f, 300f, 10)
+                }
+                .build()
 
         assertEquals(androidApi, dslCreated)
 
@@ -151,22 +168,25 @@ class VibrationEffectTest {
             }
         }
 
-        val androidApi = VibrationEffect.startComposition().apply {
-            addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK)
-            addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.5f)
-            addPrimitive(VibrationEffect.Composition.PRIMITIVE_THUD)
-            addPrimitive(VibrationEffect.Composition.PRIMITIVE_SPIN)
-            addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
-            addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE)
-            addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL)
-            addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 1f, 50)
-            addPrimitive(
-                VibrationEffect.Composition.PRIMITIVE_LOW_TICK,
-                1f,
-                50,
-                VibrationEffect.Composition.DELAY_TYPE_RELATIVE_START_OFFSET,
-            )
-        }.compose()
+        val androidApi =
+            VibrationEffect.startComposition()
+                .apply {
+                    addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK)
+                    addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.5f)
+                    addPrimitive(VibrationEffect.Composition.PRIMITIVE_THUD)
+                    addPrimitive(VibrationEffect.Composition.PRIMITIVE_SPIN)
+                    addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
+                    addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE)
+                    addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL)
+                    addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 1f, 50)
+                    addPrimitive(
+                        VibrationEffect.Composition.PRIMITIVE_LOW_TICK,
+                        1f,
+                        50,
+                        VibrationEffect.Composition.DELAY_TYPE_RELATIVE_START_OFFSET,
+                    )
+                }
+                .compose()
 
         assertEquals(androidApi, dslCreated)
     }
@@ -180,11 +200,12 @@ class VibrationEffectTest {
             .3f after 20.milliseconds
         }
 
-        val androidApi = VibrationEffect.createWaveform(
-            longArrayOf(10, 10, 10, 20),
-            intArrayOf(60, 80, 100, .3f.times(255).roundToInt().coerceIn(0..255)),
-            -1,
-        )
+        val androidApi =
+            VibrationEffect.createWaveform(
+                longArrayOf(10, 10, 10, 20),
+                intArrayOf(60, 80, 100, .3f.times(255).roundToInt().coerceIn(0..255)),
+                -1,
+            )
 
         assertEquals(androidApi, dslCreated)
 
@@ -206,10 +227,11 @@ class VibrationEffectTest {
             pattern(10.milliseconds, 10.milliseconds)
         }
 
-        val androidApi = VibrationEffect.createWaveform(
-            longArrayOf(10, 10, 10, 20, 10, 10),
-            -1,
-        )
+        val androidApi =
+            VibrationEffect.createWaveform(
+                longArrayOf(10, 10, 10, 20, 10, 10),
+                -1,
+            )
 
         assertEquals(androidApi, dslCreated)
     }
@@ -218,10 +240,16 @@ class VibrationEffectTest {
     fun testOnOffEffectChecks() {
         assertFailsWith<IllegalStateException> { // Empty
             onOffVibrationEffect {
-                assertFailsWith<IllegalArgumentException> { range((-1).milliseconds..0.milliseconds) }
-                assertFailsWith<IllegalArgumentException> { range(0.milliseconds..(-1).milliseconds) }
+                assertFailsWith<IllegalArgumentException> {
+                    range((-1).milliseconds..0.milliseconds)
+                }
+                assertFailsWith<IllegalArgumentException> {
+                    range(0.milliseconds..(-1).milliseconds)
+                }
                 assertFailsWith<IllegalArgumentException> { range(2.milliseconds, 1.milliseconds) }
-                assertFailsWith<IllegalArgumentException> { pattern((-1).milliseconds, 0.milliseconds) }
+                assertFailsWith<IllegalArgumentException> {
+                    pattern((-1).milliseconds, 0.milliseconds)
+                }
                 list
             }
         }
@@ -249,10 +277,11 @@ class VibrationEffectTest {
             range(7.milliseconds..8.milliseconds)
         }
 
-        val androidApi = VibrationEffect.createWaveform(
-            longArrayOf(0, 5, 1, 3, 1, 9),
-            -1,
-        )
+        val androidApi =
+            VibrationEffect.createWaveform(
+                longArrayOf(0, 5, 1, 3, 1, 9),
+                -1,
+            )
 
         assertEquals(androidApi, dslCreated)
     }

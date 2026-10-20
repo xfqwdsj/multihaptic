@@ -3,6 +3,7 @@ package top.ltfan.multihaptic.platform.android
 import android.os.Build
 import android.os.VibrationEffect
 import androidx.annotation.RequiresApi
+import kotlin.math.roundToInt
 import top.ltfan.multihaptic.platform.android.dsl.AmplitudeConfig
 import top.ltfan.multihaptic.platform.android.dsl.AmplitudeDsl
 import top.ltfan.multihaptic.platform.android.dsl.EnvelopeConfig
@@ -13,29 +14,34 @@ import top.ltfan.multihaptic.platform.android.dsl.amplitudeConfig
 import top.ltfan.multihaptic.platform.android.dsl.envelopeConfig
 import top.ltfan.multihaptic.platform.android.dsl.toNative
 import top.ltfan.multihaptic.platform.android.dsl.waveformConfig
-import kotlin.math.roundToInt
 
-public fun WaveformConfig.scaled(factor: Float): WaveformConfig = copy(
-    controlPoints = controlPoints.map { point ->
-        val amplitude = point.data.amplitude * factor
-        require(amplitude in 0f..1f) { "Scaled amplitude must be between 0 and 1." }
-        point.copy(data = point.data.copy(amplitude = amplitude))
-    },
-)
+public fun WaveformConfig.scaled(factor: Float): WaveformConfig =
+    copy(
+        controlPoints =
+            controlPoints.map { point ->
+                val amplitude = point.data.amplitude * factor
+                require(amplitude in 0f..1f) { "Scaled amplitude must be between 0 and 1." }
+                point.copy(data = point.data.copy(amplitude = amplitude))
+            },
+    )
 
-public fun EnvelopeConfig.scaled(factor: Float): EnvelopeConfig = copy(
-    controlPoints = controlPoints.map { point ->
-        val intensity = point.data.intensity * factor
-        require(intensity in 0f..1f) { "Scaled intensity must be between 0 and 1." }
-        point.copy(data = point.data.copy(intensity = intensity))
-    },
-)
+public fun EnvelopeConfig.scaled(factor: Float): EnvelopeConfig =
+    copy(
+        controlPoints =
+            controlPoints.map { point ->
+                val intensity = point.data.intensity * factor
+                require(intensity in 0f..1f) { "Scaled intensity must be between 0 and 1." }
+                point.copy(data = point.data.copy(intensity = intensity))
+            },
+    )
 
-public fun AmplitudeConfig.scaled(factor: Float): AmplitudeConfig = copy(
-    controlPoints = controlPoints.map { point ->
-        point.copy(amplitude = (point.amplitude * factor).roundToInt().coerceIn(0..255))
-    },
-)
+public fun AmplitudeConfig.scaled(factor: Float): AmplitudeConfig =
+    copy(
+        controlPoints =
+            controlPoints.map { point ->
+                point.copy(amplitude = (point.amplitude * factor).roundToInt().coerceIn(0..255))
+            },
+    )
 
 @RequiresApi(Build.VERSION_CODES.BAKLAVA)
 public fun waveformVibrationEffect(

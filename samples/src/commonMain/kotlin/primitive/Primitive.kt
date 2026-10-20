@@ -1,10 +1,10 @@
 package samples.primitive
 
+import kotlin.time.Duration.Companion.milliseconds
 import top.ltfan.multihaptic.DelayType
 import top.ltfan.multihaptic.HapticEffect
 import top.ltfan.multihaptic.PrimitiveType
 import top.ltfan.multihaptic.predefined
-import kotlin.time.Duration.Companion.milliseconds
 
 fun delayTypePauseExample() {
     HapticEffect {

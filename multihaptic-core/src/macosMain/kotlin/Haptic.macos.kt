@@ -6,8 +6,8 @@ import top.ltfan.multihaptic.vibrator.HapticFeedbackVibrator
 import top.ltfan.multihaptic.vibrator.Vibrator
 
 /**
- * Selects Core Haptics on compatible macOS hardware, with AppKit haptic
- * feedback for the remaining supported systems.
+ * Selects Core Haptics on compatible macOS hardware, with AppKit haptic feedback for the remaining
+ * supported systems.
  *
  * @param coroutineScope The coroutine scope to use for vibration effects.
  * @param config Unused on macOS.

@@ -4,6 +4,9 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.annotation.RequiresApi
+import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import top.ltfan.multihaptic.BasicPrimitive
@@ -26,11 +29,9 @@ import top.ltfan.multihaptic.platform.android.dsl.primitive
 import top.ltfan.multihaptic.platform.android.dsl.range
 import top.ltfan.multihaptic.platform.android.envelopeVibrationEffect
 import top.ltfan.multihaptic.unpack
-import kotlin.math.roundToInt
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
-public class AndroidVibrator internal constructor(private val vibrator: Vibrator, coroutineScope: CoroutineScope) :
+public class AndroidVibrator
+internal constructor(private val vibrator: Vibrator, coroutineScope: CoroutineScope) :
     AbstractVibrator(coroutineScope) {
 
     override suspend fun perform(effect: HapticEffect) {
@@ -41,9 +42,12 @@ public class AndroidVibrator internal constructor(private val vibrator: Vibrator
 
         effect.unpack { basic ->
             when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && basic.isComposedSupported -> composed(basic)
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA && isEnvelopeSupported -> envelope(basic)
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isAmplitudeSupported -> amplitude(basic)
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && basic.isComposedSupported ->
+                    composed(basic)
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA && isEnvelopeSupported ->
+                    envelope(basic)
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isAmplitudeSupported ->
+                    amplitude(basic)
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> onOff(basic)
                 else -> fallback(basic)
             }
@@ -52,17 +56,27 @@ public class AndroidVibrator internal constructor(private val vibrator: Vibrator
 
     override fun cancel(): Unit = vibrator.cancel()
 
-    override val isVibrationSupported: Boolean get() = vibrator.hasVibrator()
+    override val isVibrationSupported: Boolean
+        get() = vibrator.hasVibrator()
 
     private val HapticEffect.isComposedSupported: Boolean
-        @RequiresApi(Build.VERSION_CODES.R) inline get() = primitives.all { it.basic is BasicPrimitive.Predefined } && vibrator.areAllPrimitivesSupported(
-            *primitives.map { (it.basic as? BasicPrimitive.Predefined)?.composedPrimitiveType?.id ?: return false }
-                .toIntArray(),
-        )
+        @RequiresApi(Build.VERSION_CODES.R)
+        inline get() =
+            primitives.all { it.basic is BasicPrimitive.Predefined } &&
+                vibrator.areAllPrimitivesSupported(
+                    *primitives
+                        .map {
+                            (it.basic as? BasicPrimitive.Predefined)?.composedPrimitiveType?.id
+                                ?: return false
+                        }
+                        .toIntArray(),
+                )
 
     private val BasicPrimitive.isComposedSupported: Boolean
-        @RequiresApi(Build.VERSION_CODES.R) inline get() =
-            this is BasicPrimitive.Predefined && vibrator.areAllPrimitivesSupported(composedPrimitiveType.id)
+        @RequiresApi(Build.VERSION_CODES.R)
+        inline get() =
+            this is BasicPrimitive.Predefined &&
+                vibrator.areAllPrimitivesSupported(composedPrimitiveType.id)
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun composed(effect: HapticEffect) {
@@ -80,18 +94,21 @@ public class AndroidVibrator internal constructor(private val vibrator: Vibrator
             primitive(basic.composedPrimitiveType) {
                 scale = basic.scale
             }
-        }.let { vibrator.vibrate(it) }
+        }
+            .let { vibrator.vibrate(it) }
     }
 
     private val isEnvelopeSupported: Boolean
-        @RequiresApi(Build.VERSION_CODES.BAKLAVA) inline get() = vibrator.areEnvelopeEffectsSupported()
+        @RequiresApi(Build.VERSION_CODES.BAKLAVA)
+        inline get() = vibrator.areEnvelopeEffectsSupported()
 
     @RequiresApi(Build.VERSION_CODES.BAKLAVA)
     private fun envelope(basic: BasicPrimitive) {
         vibrator.vibrate(basic.envelopeEffect)
     }
 
-    private val isAmplitudeSupported @RequiresApi(Build.VERSION_CODES.O) inline get() = vibrator.hasAmplitudeControl()
+    private val isAmplitudeSupported
+        @RequiresApi(Build.VERSION_CODES.O) inline get() = vibrator.hasAmplitudeControl()
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun amplitude(basic: BasicPrimitive) {
@@ -108,88 +125,101 @@ public class AndroidVibrator internal constructor(private val vibrator: Vibrator
     }
 
     private val BasicPrimitive.envelopeEffect
-        @RequiresApi(Build.VERSION_CODES.BAKLAVA) get() = when (this) {
-            is BasicPrimitive.Predefined -> when (type) {
-                PrimitiveType.Click -> envelopeVibrationEffect(scale) {
-                    point(.8f, 1f) at type.duration
-                    point(0f, 1f) after 5.milliseconds
-                }
+        @RequiresApi(Build.VERSION_CODES.BAKLAVA)
+        get() =
+            when (this) {
+                is BasicPrimitive.Predefined ->
+                    when (type) {
+                        PrimitiveType.Click ->
+                            envelopeVibrationEffect(scale) {
+                                point(.8f, 1f) at type.duration
+                                point(0f, 1f) after 5.milliseconds
+                            }
 
-                PrimitiveType.Thud -> envelopeVibrationEffect(scale) {
-                    point(1f, .6f) at 20.milliseconds
-                    point(.5f, .2f) after 60.milliseconds
-                    point(0f, 1f) after 5.milliseconds
-                }
+                        PrimitiveType.Thud ->
+                            envelopeVibrationEffect(scale) {
+                                point(1f, .6f) at 20.milliseconds
+                                point(.5f, .2f) after 60.milliseconds
+                                point(0f, 1f) after 5.milliseconds
+                            }
 
-                PrimitiveType.Spin -> envelopeVibrationEffect(scale, .4f) {
-                    point(.8f, .4f) at 40.milliseconds
-                    point(.7f, .4f) at 80.milliseconds
-                    point(0f, .4f) at 120.milliseconds
-                    point(0f, 1f) after 5.milliseconds
-                }
+                        PrimitiveType.Spin ->
+                            envelopeVibrationEffect(scale, .4f) {
+                                point(.8f, .4f) at 40.milliseconds
+                                point(.7f, .4f) at 80.milliseconds
+                                point(0f, .4f) at 120.milliseconds
+                                point(0f, 1f) after 5.milliseconds
+                            }
 
-                PrimitiveType.QuickRise -> envelopeVibrationEffect(scale, .2f) {
-                    point(1f, 1f) at 50.milliseconds
-                    point(0f, 1f) after 5.milliseconds
-                }
+                        PrimitiveType.QuickRise ->
+                            envelopeVibrationEffect(scale, .2f) {
+                                point(1f, 1f) at 50.milliseconds
+                                point(0f, 1f) after 5.milliseconds
+                            }
 
-                PrimitiveType.SlowRise -> envelopeVibrationEffect(scale, .1f) {
-                    point(.7f, .5f) at 200.milliseconds
-                    point(0f, 1f) after 5.milliseconds
-                }
+                        PrimitiveType.SlowRise ->
+                            envelopeVibrationEffect(scale, .1f) {
+                                point(.7f, .5f) at 200.milliseconds
+                                point(0f, 1f) after 5.milliseconds
+                            }
 
-                PrimitiveType.QuickFall -> envelopeVibrationEffect(scale, 1f) {
-                    point(1f, 1f) at 5.milliseconds
-                    point(.2f, .2f) at 60.milliseconds
-                    point(0f, 1f) after 5.milliseconds
-                }
+                        PrimitiveType.QuickFall ->
+                            envelopeVibrationEffect(scale, 1f) {
+                                point(1f, 1f) at 5.milliseconds
+                                point(.2f, .2f) at 60.milliseconds
+                                point(0f, 1f) after 5.milliseconds
+                            }
 
-                PrimitiveType.Tick -> envelopeVibrationEffect(scale, 1f) {
-                    point(1f, 1f) at type.duration
-                    point(0f, 1f) after 5.milliseconds
-                }
+                        PrimitiveType.Tick ->
+                            envelopeVibrationEffect(scale, 1f) {
+                                point(1f, 1f) at type.duration
+                                point(0f, 1f) after 5.milliseconds
+                            }
 
-                PrimitiveType.LowTick -> envelopeVibrationEffect(scale, .8f) {
-                    point(.8f, .8f) at type.duration
-                    point(0f, 1f) after 5.milliseconds
-                }
-            }
+                        PrimitiveType.LowTick ->
+                            envelopeVibrationEffect(scale, .8f) {
+                                point(.8f, .8f) at type.duration
+                                point(0f, 1f) after 5.milliseconds
+                            }
+                    }
 
-            is BasicPrimitive.Custom -> {
-                val allTimes = (curves.intensity + curves.sharpness).map { it.time }.distinct().sorted()
+                is BasicPrimitive.Custom -> {
+                    val allTimes =
+                        (curves.intensity + curves.sharpness).map { it.time }.distinct().sorted()
 
-                var timeShift = Duration.ZERO
-                var initialSharpness: Float? = null
+                    var timeShift = Duration.ZERO
+                    var initialSharpness: Float? = null
 
-                if (curves.intensity.firstOrNull()?.time == Duration.ZERO) {
-                    timeShift = 5.milliseconds
-                }
-                if (curves.sharpness.firstOrNull()?.time == Duration.ZERO) {
-                    initialSharpness = curves.sharpness.first().value
-                }
+                    if (curves.intensity.firstOrNull()?.time == Duration.ZERO) {
+                        timeShift = 5.milliseconds
+                    }
+                    if (curves.sharpness.firstOrNull()?.time == Duration.ZERO) {
+                        initialSharpness = curves.sharpness.first().value
+                    }
 
-                val controlPoints = mutableListOf<Pair<EnvelopePoint, Duration>>()
-                allTimes.forEach { time ->
-                    val intensity = getValueAt(time, curves.intensity)
-                    val sharpness = getValueAt(time, curves.sharpness)
-                    controlPoints.add(
-                        EnvelopePoint(intensity, sharpness) to time + timeShift,
-                    )
-                }
+                    val controlPoints = mutableListOf<Pair<EnvelopePoint, Duration>>()
+                    allTimes.forEach { time ->
+                        val intensity = getValueAt(time, curves.intensity)
+                        val sharpness = getValueAt(time, curves.sharpness)
+                        controlPoints.add(
+                            EnvelopePoint(intensity, sharpness) to time + timeShift,
+                        )
+                    }
 
-                envelopeVibrationEffect(scale, initialSharpness) {
-                    controlPoints.forEach { (data, time) -> data at time }
+                    envelopeVibrationEffect(scale, initialSharpness) {
+                        controlPoints.forEach { (data, time) -> data at time }
 
-                    val lastPoint = controlPoints.lastOrNull()
-                    if (lastPoint != null && lastPoint.first.intensity > 0f) {
-                        point(0f, lastPoint.first.sharpness) after 5.milliseconds
+                        val lastPoint = controlPoints.lastOrNull()
+                        if (lastPoint != null && lastPoint.first.intensity > 0f) {
+                            point(0f, lastPoint.first.sharpness) after 5.milliseconds
+                        }
                     }
                 }
             }
-        }
 
     private val HapticEffect.composedEffect
-        @RequiresApi(Build.VERSION_CODES.R) get() = composedVibrationEffect {
+        @RequiresApi(Build.VERSION_CODES.R)
+        get() = composedVibrationEffect {
             this@composedEffect.primitives.forEach { effectPrimitive ->
                 if (effectPrimitive.basic !is BasicPrimitive.Predefined) return@forEach
 
@@ -204,198 +234,245 @@ public class AndroidVibrator internal constructor(private val vibrator: Vibrator
         }
 
     private val BasicPrimitive.Predefined.composedPrimitiveType
-        @RequiresApi(Build.VERSION_CODES.R) get() = when (type) {
-            PrimitiveType.Click -> AndroidPrimitiveType.Click
-            PrimitiveType.Thud -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                AndroidPrimitiveType.Thud
-            } else {
-                AndroidPrimitiveType.Click
-            }
+        @RequiresApi(Build.VERSION_CODES.R)
+        get() =
+            when (type) {
+                PrimitiveType.Click -> AndroidPrimitiveType.Click
+                PrimitiveType.Thud ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        AndroidPrimitiveType.Thud
+                    } else {
+                        AndroidPrimitiveType.Click
+                    }
 
-            PrimitiveType.Spin -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                AndroidPrimitiveType.Spin
-            } else {
-                AndroidPrimitiveType.QuickRise
-            }
+                PrimitiveType.Spin ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        AndroidPrimitiveType.Spin
+                    } else {
+                        AndroidPrimitiveType.QuickRise
+                    }
 
-            PrimitiveType.QuickRise -> AndroidPrimitiveType.QuickRise
-            PrimitiveType.SlowRise -> AndroidPrimitiveType.QuickRise
-            PrimitiveType.QuickFall -> AndroidPrimitiveType.QuickFall
-            PrimitiveType.Tick -> AndroidPrimitiveType.Tick
-            PrimitiveType.LowTick -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                AndroidPrimitiveType.LowTick
-            } else {
-                AndroidPrimitiveType.Tick
+                PrimitiveType.QuickRise -> AndroidPrimitiveType.QuickRise
+                PrimitiveType.SlowRise -> AndroidPrimitiveType.QuickRise
+                PrimitiveType.QuickFall -> AndroidPrimitiveType.QuickFall
+                PrimitiveType.Tick -> AndroidPrimitiveType.Tick
+                PrimitiveType.LowTick ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        AndroidPrimitiveType.LowTick
+                    } else {
+                        AndroidPrimitiveType.Tick
+                    }
             }
-        }
 
     private val BasicPrimitive.amplitudeEffect
-        @RequiresApi(Build.VERSION_CODES.O) get() = when (this) {
-            is BasicPrimitive.Predefined -> when (type) {
-                PrimitiveType.Click -> amplitudeVibrationEffect(scale) {
-                    .9f after type.duration
-                }
+        @RequiresApi(Build.VERSION_CODES.O)
+        get() =
+            when (this) {
+                is BasicPrimitive.Predefined ->
+                    when (type) {
+                        PrimitiveType.Click ->
+                            amplitudeVibrationEffect(scale) {
+                                .9f after type.duration
+                            }
 
-                PrimitiveType.Thud -> amplitudeVibrationEffect(scale) {
-                    1f after 20.milliseconds
-                    .5f after 60.milliseconds
-                }
+                        PrimitiveType.Thud ->
+                            amplitudeVibrationEffect(scale) {
+                                1f after 20.milliseconds
+                                .5f after 60.milliseconds
+                            }
 
-                PrimitiveType.Spin -> amplitudeVibrationEffect(scale) {
-                    .2f after 40.milliseconds
-                    .8f after 40.milliseconds
-                    .7f after 40.milliseconds
-                }
+                        PrimitiveType.Spin ->
+                            amplitudeVibrationEffect(scale) {
+                                .2f after 40.milliseconds
+                                .8f after 40.milliseconds
+                                .7f after 40.milliseconds
+                            }
 
-                PrimitiveType.QuickRise -> amplitudeVibrationEffect(scale) {
-                    .1f after 25.milliseconds
-                    1f after 25.milliseconds
-                }
+                        PrimitiveType.QuickRise ->
+                            amplitudeVibrationEffect(scale) {
+                                .1f after 25.milliseconds
+                                1f after 25.milliseconds
+                            }
 
-                PrimitiveType.SlowRise -> amplitudeVibrationEffect(scale) {
-                    .1f after 100.milliseconds
-                    .7f after 100.milliseconds
-                }
+                        PrimitiveType.SlowRise ->
+                            amplitudeVibrationEffect(scale) {
+                                .1f after 100.milliseconds
+                                .7f after 100.milliseconds
+                            }
 
-                PrimitiveType.QuickFall -> amplitudeVibrationEffect(scale) {
-                    1f after 30.milliseconds
-                    .2f after 30.milliseconds
-                }
+                        PrimitiveType.QuickFall ->
+                            amplitudeVibrationEffect(scale) {
+                                1f after 30.milliseconds
+                                .2f after 30.milliseconds
+                            }
 
-                PrimitiveType.Tick -> amplitudeVibrationEffect(scale) {
-                    1f after type.duration
-                }
+                        PrimitiveType.Tick ->
+                            amplitudeVibrationEffect(scale) {
+                                1f after type.duration
+                            }
 
-                PrimitiveType.LowTick -> amplitudeVibrationEffect(scale) {
-                    .6f after type.duration
+                        PrimitiveType.LowTick ->
+                            amplitudeVibrationEffect(scale) {
+                                .6f after type.duration
+                            }
+                    }
+
+                is BasicPrimitive.Custom -> {
+                    val times = mutableListOf<Long>()
+                    val amplitudes = mutableListOf<Int>()
+
+                    val intensityCurve = buildList {
+                        val first = curves.intensity.first()
+                        val last = curves.intensity.last()
+                        if (first.time != Duration.ZERO) {
+                            add(Keyframe(Duration.ZERO, first.value))
+                        }
+                        addAll(curves.intensity)
+                        if (last.time != duration) {
+                            add(Keyframe(duration, last.value))
+                        }
+                    }
+
+                    intensityCurve.forEachIndexed { index, (time, value) ->
+                        val lastTime =
+                            if (index == 0) 0L
+                            else intensityCurve[index - 1].time.inWholeMilliseconds
+                        val nextTime =
+                            if (index == intensityCurve.lastIndex) {
+                                time.inWholeMilliseconds
+                            } else {
+                                intensityCurve[index + 1].time.inWholeMilliseconds
+                            }
+
+                        times += (nextTime - lastTime) / 2
+                        amplitudes += value.scale(scale)
+                    }
+
+                    VibrationEffect.createWaveform(
+                        times.toLongArray(),
+                        amplitudes.toIntArray(),
+                        -1,
+                    )
                 }
             }
-
-            is BasicPrimitive.Custom -> {
-                val times = mutableListOf<Long>()
-                val amplitudes = mutableListOf<Int>()
-
-                val intensityCurve = buildList {
-                    val first = curves.intensity.first()
-                    val last = curves.intensity.last()
-                    if (first.time != Duration.ZERO) {
-                        add(Keyframe(Duration.ZERO, first.value))
-                    }
-                    addAll(curves.intensity)
-                    if (last.time != duration) {
-                        add(Keyframe(duration, last.value))
-                    }
-                }
-
-                intensityCurve.forEachIndexed { index, (time, value) ->
-                    val lastTime = if (index == 0) 0L else intensityCurve[index - 1].time.inWholeMilliseconds
-                    val nextTime = if (index == intensityCurve.lastIndex) {
-                        time.inWholeMilliseconds
-                    } else {
-                        intensityCurve[index + 1].time.inWholeMilliseconds
-                    }
-
-                    times += (nextTime - lastTime) / 2
-                    amplitudes += value.scale(scale)
-                }
-
-                VibrationEffect.createWaveform(
-                    times.toLongArray(), amplitudes.toIntArray(), -1,
-                )
-            }
-        }
 
     private val BasicPrimitive.onOffEffect
-        @RequiresApi(Build.VERSION_CODES.O) get() = when (this) {
-            is BasicPrimitive.Predefined -> when (type) {
-                PrimitiveType.Click -> onOffVibrationEffect {
-                    range(0.milliseconds..type.duration)
-                }
+        @RequiresApi(Build.VERSION_CODES.O)
+        get() =
+            when (this) {
+                is BasicPrimitive.Predefined ->
+                    when (type) {
+                        PrimitiveType.Click ->
+                            onOffVibrationEffect {
+                                range(0.milliseconds..type.duration)
+                            }
 
-                PrimitiveType.Thud -> onOffVibrationEffect {
-                    range(0.milliseconds..10.milliseconds)
-                    range(20.milliseconds..80.milliseconds)
-                }
+                        PrimitiveType.Thud ->
+                            onOffVibrationEffect {
+                                range(0.milliseconds..10.milliseconds)
+                                range(20.milliseconds..80.milliseconds)
+                            }
 
-                PrimitiveType.Spin -> onOffVibrationEffect {
-                    range(0.milliseconds..20.milliseconds)
-                    range(30.milliseconds..60.milliseconds)
-                    range(70.milliseconds..120.milliseconds)
-                }
+                        PrimitiveType.Spin ->
+                            onOffVibrationEffect {
+                                range(0.milliseconds..20.milliseconds)
+                                range(30.milliseconds..60.milliseconds)
+                                range(70.milliseconds..120.milliseconds)
+                            }
 
-                PrimitiveType.QuickRise -> onOffVibrationEffect {
-                    range(0.milliseconds..10.milliseconds)
-                    range(20.milliseconds..50.milliseconds)
-                }
+                        PrimitiveType.QuickRise ->
+                            onOffVibrationEffect {
+                                range(0.milliseconds..10.milliseconds)
+                                range(20.milliseconds..50.milliseconds)
+                            }
 
-                PrimitiveType.SlowRise -> onOffVibrationEffect {
-                    range(0.milliseconds..10.milliseconds)
-                    range(20.milliseconds..30.milliseconds)
-                    range(40.milliseconds..60.milliseconds)
-                    range(70.milliseconds..100.milliseconds)
-                }
+                        PrimitiveType.SlowRise ->
+                            onOffVibrationEffect {
+                                range(0.milliseconds..10.milliseconds)
+                                range(20.milliseconds..30.milliseconds)
+                                range(40.milliseconds..60.milliseconds)
+                                range(70.milliseconds..100.milliseconds)
+                            }
 
-                PrimitiveType.QuickFall -> onOffVibrationEffect {
-                    range(0.milliseconds..40.milliseconds)
-                    range(50.milliseconds..60.milliseconds)
-                }
+                        PrimitiveType.QuickFall ->
+                            onOffVibrationEffect {
+                                range(0.milliseconds..40.milliseconds)
+                                range(50.milliseconds..60.milliseconds)
+                            }
 
-                PrimitiveType.Tick -> onOffVibrationEffect {
-                    range(0.milliseconds..type.duration)
-                }
+                        PrimitiveType.Tick ->
+                            onOffVibrationEffect {
+                                range(0.milliseconds..type.duration)
+                            }
 
-                PrimitiveType.LowTick -> onOffVibrationEffect {
-                    range(0.milliseconds..type.duration)
-                }
-            }
-
-            is BasicPrimitive.Custom -> {
-                val times = mutableListOf<Long>()
-
-                val intensityCurve = mutableListOf<Keyframe>().apply {
-                    if (curves.intensity.first().time != Duration.ZERO) {
-                        add(Keyframe(Duration.ZERO, 0f))
-                    }
-                    addAll(curves.intensity)
-                }
-
-                intensityCurve.forEachIndexed { index, (time, value) ->
-                    val lastTime = if (index == 0) 0L else intensityCurve[index - 1].time.inWholeMilliseconds
-                    val nextTime = if (index == intensityCurve.lastIndex) {
-                        time.inWholeMilliseconds
-                    } else {
-                        intensityCurve[index + 1].time.inWholeMilliseconds
+                        PrimitiveType.LowTick ->
+                            onOffVibrationEffect {
+                                range(0.milliseconds..type.duration)
+                            }
                     }
 
-                    val delta = if (index == 0 || index == intensityCurve.lastIndex) {
-                        OffTimeOfCustomOnOffEffect / 2
-                    } else {
-                        OffTimeOfCustomOnOffEffect
-                    }.inWholeMilliseconds
+                is BasicPrimitive.Custom -> {
+                    val times = mutableListOf<Long>()
 
-                    times += if (index == 0) 0 else OffTimeOfCustomOnOffEffect.inWholeMilliseconds
-                    times += if (value > 0) (nextTime - lastTime) / 2 - delta else 0
+                    val intensityCurve =
+                        mutableListOf<Keyframe>().apply {
+                            if (curves.intensity.first().time != Duration.ZERO) {
+                                add(Keyframe(Duration.ZERO, 0f))
+                            }
+                            addAll(curves.intensity)
+                        }
+
+                    intensityCurve.forEachIndexed { index, (time, value) ->
+                        val lastTime =
+                            if (index == 0) 0L
+                            else intensityCurve[index - 1].time.inWholeMilliseconds
+                        val nextTime =
+                            if (index == intensityCurve.lastIndex) {
+                                time.inWholeMilliseconds
+                            } else {
+                                intensityCurve[index + 1].time.inWholeMilliseconds
+                            }
+
+                        val delta =
+                            if (index == 0 || index == intensityCurve.lastIndex) {
+                                    OffTimeOfCustomOnOffEffect / 2
+                                } else {
+                                    OffTimeOfCustomOnOffEffect
+                                }
+                                .inWholeMilliseconds
+
+                        times +=
+                            if (index == 0) 0 else OffTimeOfCustomOnOffEffect.inWholeMilliseconds
+                        times += if (value > 0) (nextTime - lastTime) / 2 - delta else 0
+                    }
+
+                    VibrationEffect.createWaveform(times.toLongArray(), -1)
                 }
-
-                VibrationEffect.createWaveform(times.toLongArray(), -1)
             }
-        }
 
     private val DelayType.androidDelayType
-        @RequiresApi(Build.VERSION_CODES.BAKLAVA) get() = when (this) {
-            DelayType.Pause -> AndroidDelayType.Pause
-            DelayType.RelativeStartOffset -> AndroidDelayType.RelativeStartOffset
-        }
+        @RequiresApi(Build.VERSION_CODES.BAKLAVA)
+        get() =
+            when (this) {
+                DelayType.Pause -> AndroidDelayType.Pause
+                DelayType.RelativeStartOffset -> AndroidDelayType.RelativeStartOffset
+            }
 
     private fun getValueAt(time: Duration, curve: List<Keyframe>): Float {
-        curve.find { it.time == time }?.let { return it.value }
+        curve
+            .find { it.time == time }
+            ?.let {
+                return it.value
+            }
 
         val prev = curve.lastOrNull { it.time < time } ?: return curve.firstOrNull()?.value ?: 0f
         val next = curve.firstOrNull { it.time > time }
 
         if (next == null) return prev.value
 
-        val timeRatio = (time - prev.time).inWholeMilliseconds.toFloat() / (next.time - prev.time).inWholeMilliseconds
+        val timeRatio =
+            (time - prev.time).inWholeMilliseconds.toFloat() /
+                (next.time - prev.time).inWholeMilliseconds
         return prev.value + (next.value - prev.value) * timeRatio
     }
 

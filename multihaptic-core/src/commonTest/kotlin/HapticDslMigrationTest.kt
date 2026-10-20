@@ -45,7 +45,10 @@ class HapticDslMigrationTest {
             intensity { 0.2f at 10.milliseconds }
             intensity { 0.5f at 20.milliseconds }
         }
-        assertEquals(listOf(Keyframe(10.milliseconds, 0.2f), Keyframe(20.milliseconds, 0.5f)), curves.intensity)
+        assertEquals(
+            listOf(Keyframe(10.milliseconds, 0.2f), Keyframe(20.milliseconds, 0.5f)),
+            curves.intensity,
+        )
         assertEquals(listOf(Keyframe(0.milliseconds, 1f)), curves.sharpness)
     }
 

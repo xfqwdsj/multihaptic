@@ -1,5 +1,6 @@
 package samples.effect
 
+import kotlin.time.Duration.Companion.milliseconds
 import top.ltfan.multihaptic.DelayType
 import top.ltfan.multihaptic.HapticEffect
 import top.ltfan.multihaptic.PrimitiveType
@@ -12,7 +13,6 @@ import top.ltfan.multihaptic.predefined
 import top.ltfan.multihaptic.quickRise
 import top.ltfan.multihaptic.sharpness
 import top.ltfan.multihaptic.spinFallback
-import kotlin.time.Duration.Companion.milliseconds
 
 fun buildHapticEffect() {
     HapticEffect {
@@ -27,7 +27,10 @@ fun buildHapticEffect() {
         predefined(PrimitiveType.Tick) {
             scale = .3f // Adjust the intensity of the tick
             delay = 50.milliseconds // Delay before the tick effect
-            delayType = DelayType.RelativeStartOffset // 50 milliseconds relative to the start of the previous effect
+            delayType =
+                DelayType
+                    .RelativeStartOffset // 50 milliseconds relative to the start of the previous
+            // effect
         }
         lowTick {
             delay = 30.milliseconds

@@ -1,5 +1,6 @@
 package top.ltfan.multihaptic.platform.apple.corehaptics.dsl
 
+import kotlin.time.Duration
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreHaptics.CHHapticDynamicParameterIDHapticAttackTimeControl
@@ -21,48 +22,74 @@ import platform.CoreHaptics.CHHapticParameterCurve
 import platform.CoreHaptics.CHHapticParameterCurveControlPoint
 import platform.CoreHaptics.CHHapticPattern
 import top.ltfan.multihaptic.platform.apple.runThrowing
-import kotlin.time.Duration
 
 public fun HapticEvent.toNative(): CHHapticEvent {
     val parameters = buildList {
-        hapticIntensity?.let { add(CHHapticEventParameter(CHHapticEventParameterIDHapticIntensity, it)) }
-        hapticSharpness?.let { add(CHHapticEventParameter(CHHapticEventParameterIDHapticSharpness, it)) }
+        hapticIntensity?.let {
+            add(CHHapticEventParameter(CHHapticEventParameterIDHapticIntensity, it))
+        }
+        hapticSharpness?.let {
+            add(CHHapticEventParameter(CHHapticEventParameterIDHapticSharpness, it))
+        }
         if (this@toNative is ContinuousEvent) {
-            attackTime?.let { add(CHHapticEventParameter(CHHapticEventParameterIDAttackTime, it.seconds.toFloat())) }
-            decayTime?.let { add(CHHapticEventParameter(CHHapticEventParameterIDDecayTime, it.seconds.toFloat())) }
-            add(CHHapticEventParameter(CHHapticEventParameterIDReleaseTime, releaseTime.seconds.toFloat()))
-            add(CHHapticEventParameter(CHHapticEventParameterIDSustained, if (sustained) 1f else 0f))
+            attackTime?.let {
+                add(
+                    CHHapticEventParameter(
+                        CHHapticEventParameterIDAttackTime,
+                        it.seconds.toFloat(),
+                    ),
+                )
+            }
+            decayTime?.let {
+                add(CHHapticEventParameter(CHHapticEventParameterIDDecayTime, it.seconds.toFloat()))
+            }
+            add(
+                CHHapticEventParameter(
+                    CHHapticEventParameterIDReleaseTime,
+                    releaseTime.seconds.toFloat(),
+                ),
+            )
+            add(
+                CHHapticEventParameter(
+                    CHHapticEventParameterIDSustained,
+                    if (sustained) 1f else 0f,
+                ),
+            )
         }
     }
     return when (this) {
-        is TransientEvent -> CHHapticEvent(
-            eventType = CHHapticEventTypeHapticTransient,
-            parameters = parameters,
-            relativeTime = relativeTime.seconds,
-        )
+        is TransientEvent ->
+            CHHapticEvent(
+                eventType = CHHapticEventTypeHapticTransient,
+                parameters = parameters,
+                relativeTime = relativeTime.seconds,
+            )
 
-        is ContinuousEvent -> CHHapticEvent(
-            eventType = CHHapticEventTypeHapticContinuous,
-            parameters = parameters,
-            relativeTime = relativeTime.seconds,
-            duration = duration.seconds,
-        )
+        is ContinuousEvent ->
+            CHHapticEvent(
+                eventType = CHHapticEventTypeHapticContinuous,
+                parameters = parameters,
+                relativeTime = relativeTime.seconds,
+                duration = duration.seconds,
+            )
     }
 }
 
 public fun HapticParameterCurve.toNative(): CHHapticParameterCurve {
-    val parameterId = when (kind) {
-        CurveKind.Intensity -> CHHapticDynamicParameterIDHapticIntensityControl
-        CurveKind.Sharpness -> CHHapticDynamicParameterIDHapticSharpnessControl
-        CurveKind.AttackTime -> CHHapticDynamicParameterIDHapticAttackTimeControl
-        CurveKind.DecayTime -> CHHapticDynamicParameterIDHapticDecayTimeControl
-        CurveKind.ReleaseTime -> CHHapticDynamicParameterIDHapticReleaseTimeControl
-    }
+    val parameterId =
+        when (kind) {
+            CurveKind.Intensity -> CHHapticDynamicParameterIDHapticIntensityControl
+            CurveKind.Sharpness -> CHHapticDynamicParameterIDHapticSharpnessControl
+            CurveKind.AttackTime -> CHHapticDynamicParameterIDHapticAttackTimeControl
+            CurveKind.DecayTime -> CHHapticDynamicParameterIDHapticDecayTimeControl
+            CurveKind.ReleaseTime -> CHHapticDynamicParameterIDHapticReleaseTimeControl
+        }
     return CHHapticParameterCurve(
         parameterID = parameterId,
-        controlPoints = controlPoints.map { point ->
-            CHHapticParameterCurveControlPoint(point.relativeTime.seconds, point.value)
-        },
+        controlPoints =
+            controlPoints.map { point ->
+                CHHapticParameterCurveControlPoint(point.relativeTime.seconds, point.value)
+            },
         relativeTime = relativeTime.seconds,
     )
 }
@@ -82,4 +109,5 @@ public fun HapticPattern.toNative(): CHHapticPattern = runThrowing { error ->
 public fun CHHapticPattern(block: HapticPatternDsl.() -> Unit): CHHapticPattern =
     buildHapticPattern(block = block).toNative()
 
-private val Duration.seconds: Double get() = inWholeMilliseconds.toDouble() / 1000
+private val Duration.seconds: Double
+    get() = inWholeMilliseconds.toDouble() / 1000

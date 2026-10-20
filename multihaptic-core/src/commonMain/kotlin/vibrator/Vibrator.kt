@@ -6,9 +6,8 @@ import top.ltfan.multihaptic.HapticEffectDsl
 /**
  * Represents a vibrator that can perform haptic effects.
  *
- * This interface provides methods to vibrate with a specific
- * [HapticEffect], vibrate with a composed effect using a builder, and
- * cancel any ongoing vibrations.
+ * This interface provides methods to vibrate with a specific [HapticEffect], vibrate with a
+ * composed effect using a builder, and cancel any ongoing vibrations.
  */
 public interface Vibrator {
     /**
@@ -31,8 +30,7 @@ public interface Vibrator {
     /**
      * Checks if vibration is supported on this platform/device.
      *
-     * @return `true` if vibration hardware and API are available, `false`
-     *   otherwise.
+     * @return `true` if vibration hardware and API are available, `false` otherwise.
      */
     public val isVibrationSupported: Boolean
         get() = false

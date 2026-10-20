@@ -1,14 +1,15 @@
 package top.ltfan.multihaptic.vibrator
 
+import kotlin.time.Duration
 import kotlinx.coroutines.CoroutineScope
 import top.ltfan.multihaptic.HapticEffect
 import top.ltfan.multihaptic.isVibrationSupported
 import top.ltfan.multihaptic.performByDuration
 import top.ltfan.multihaptic.unpack
 import top.ltfan.multihaptic.vibrate
-import kotlin.time.Duration
 
-public class BrowserVibrator internal constructor(coroutineScope: CoroutineScope) : AbstractVibrator(coroutineScope) {
+public class BrowserVibrator internal constructor(coroutineScope: CoroutineScope) :
+    AbstractVibrator(coroutineScope) {
     override suspend fun perform(effect: HapticEffect) {
         effect.unpack { basic ->
             basic.performByDuration {
@@ -21,5 +22,6 @@ public class BrowserVibrator internal constructor(coroutineScope: CoroutineScope
         vibrate(Duration.ZERO)
     }
 
-    override val isVibrationSupported: Boolean get() = isVibrationSupported()
+    override val isVibrationSupported: Boolean
+        get() = isVibrationSupported()
 }

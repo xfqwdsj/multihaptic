@@ -9,7 +9,8 @@ import top.ltfan.multihaptic.HapticEffect
 import top.ltfan.multihaptic.PrimitiveType
 import top.ltfan.multihaptic.unpack
 
-public class WatchOSVibrator internal constructor(coroutineScope: CoroutineScope) : AbstractVibrator(coroutineScope) {
+public class WatchOSVibrator internal constructor(coroutineScope: CoroutineScope) :
+    AbstractVibrator(coroutineScope) {
     private val device = WKInterfaceDevice.currentDevice()
 
     override val isVibrationSupported: Boolean = true
@@ -30,14 +31,15 @@ public class WatchOSVibrator internal constructor(coroutineScope: CoroutineScope
     }
 
     private val PrimitiveType.hapticType
-        get() = when (this) {
-            PrimitiveType.Click -> WKHapticType.WKHapticTypeClick
-            PrimitiveType.Thud -> WKHapticType.WKHapticTypeNotification
-            PrimitiveType.Spin -> WKHapticType.WKHapticTypeNotification
-            PrimitiveType.QuickRise -> WKHapticType.WKHapticTypeDirectionUp
-            PrimitiveType.SlowRise -> WKHapticType.WKHapticTypeDirectionUp
-            PrimitiveType.QuickFall -> WKHapticType.WKHapticTypeDirectionDown
-            PrimitiveType.Tick -> WKHapticType.WKHapticTypeClick
-            PrimitiveType.LowTick -> WKHapticType.WKHapticTypeClick
-        }
+        get() =
+            when (this) {
+                PrimitiveType.Click -> WKHapticType.WKHapticTypeClick
+                PrimitiveType.Thud -> WKHapticType.WKHapticTypeNotification
+                PrimitiveType.Spin -> WKHapticType.WKHapticTypeNotification
+                PrimitiveType.QuickRise -> WKHapticType.WKHapticTypeDirectionUp
+                PrimitiveType.SlowRise -> WKHapticType.WKHapticTypeDirectionUp
+                PrimitiveType.QuickFall -> WKHapticType.WKHapticTypeDirectionDown
+                PrimitiveType.Tick -> WKHapticType.WKHapticTypeClick
+                PrimitiveType.LowTick -> WKHapticType.WKHapticTypeClick
+            }
 }

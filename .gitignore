@@ -3,7 +3,6 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-local.properties
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
@@ -45,3 +44,10 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Xcode ###
+xcuserdata/
+*.xcuserstate
+
+### Android ###
+local.properties

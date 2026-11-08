@@ -14,7 +14,7 @@ androidx = "1.19.1"
 androidx-annotation = "1.11.0"
 androidx-test-runner = "1.7.0"
 androidx-test-junit = "1.3.0"
-dokka = "2.2.0"
+dokka = "2.3.0"
 mavenPublish = "0.37.0"
 spotless = "8.10.4"
 
